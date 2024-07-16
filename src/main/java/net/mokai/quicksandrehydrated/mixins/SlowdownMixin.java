@@ -5,6 +5,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
@@ -23,8 +24,8 @@ import static net.mokai.quicksandrehydrated.util.ModTags.Blocks.QUICKSAND_DROWNA
 @Mixin(Entity.class)
 public abstract class SlowdownMixin implements entityQuicksandVar {
 
-    @Shadow protected Vec3 stuckSpeedMultiplier;
-    @Shadow protected boolean onGround;
+//    @Shadow
+//    protected Vec3 stuckSpeedMultiplier;
 
     public boolean changed = false;
     public double horizontal = Double.MAX_VALUE;
@@ -144,6 +145,7 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
         }
 
+        // this is dumb?! why?
         QuicksandVarEntity.setInQuicksand(false);
 
     }
@@ -157,24 +159,24 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
      * @reason makeStuckInBlock simply overwrote stuckSpeedMultiplier, which lead to instances of directional priority; now, it only accepts the strongest slowdown applied that tick.
      */
 
-    @Overwrite
-    public void makeStuckInBlock(BlockState pState, Vec3 spd) {
-
-        // It's not that easy.
-
-        if (horizontal > spd.x() || horizontal > spd.y() || !changed) {
-
-            if (!changed) { horizontal = spd.x(); vertical = spd.y(); }
-            if (horizontal > spd.x()) { horizontal = spd.x(); }
-            if (vertical > spd.y()) { vertical = spd.y(); }
-            changed = true;
-            stuckSpeedMultiplier = new Vec3(horizontal, vertical, horizontal);
-        }
-        Entity e = (Entity)(Object) this;
-        e.resetFallDistance();
-
-        // It's that easy.
-    }
+//    @Overwrite
+//    public void makeStuckInBlock(BlockState pState, Vec3 spd) {
+//
+//        // It's not that easy.
+//
+//        if (horizontal > spd.x() || horizontal > spd.y() || !changed) {
+//
+//            if (!changed) { horizontal = spd.x(); vertical = spd.y(); }
+//            if (horizontal > spd.x()) { horizontal = spd.x(); }
+//            if (vertical > spd.y()) { vertical = spd.y(); }
+//            changed = true;
+//            stuckSpeedMultiplier = new Vec3(horizontal, vertical, horizontal);
+//        }
+//        Entity e = (Entity)(Object) this;
+//        e.resetFallDistance();
+//
+//        // It's that easy.
+//    }
 
 
     @Inject(method = "collide", at = @At("HEAD"))
@@ -182,7 +184,7 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
         Entity thisEntity = (Entity)(Object)this;
         BlockState test = thisEntity.getFeetBlockState();
-        this.onGround = this.onGround || test.getTags().toList().contains(QUICKSAND_DROWNABLE);
+        thisEntity.setOnGround(thisEntity.onGround() || test.getTags().toList().contains(QUICKSAND_DROWNABLE));
         // Allows for step-up even while falling if your center is inside a Quicksand_Drownable.
 
     }
@@ -193,5 +195,34 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
         changed = false;
     }
 
-}
 
+    public boolean entQS(Entity pEntity) {
+
+        Entity thisEntity = (Entity)(Object)this;
+        entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar)(Object)this;
+
+        BlockPos stuckBlockPos = QuicksandVarEntity.getStuckBlock(thisEntity);
+        if (stuckBlockPos != null) {
+            Block stuckBlock = thisEntity.level().getBlockState(stuckBlockPos).getBlock();
+
+            if (stuckBlock instanceof QuicksandBase) {
+                QuicksandBase qsBlock = (QuicksandBase) stuckBlock;
+                double depth = qsBlock.getDepth(thisEntity.level(), thisEntity.blockPosition(), thisEntity);
+                return qsBlock.canStepOut(depth);
+            }
+        }
+        return false;
+
+    }
+
+
+
+    @Inject(method = "move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", at = @At("TAIL"))
+    private void onMoveAfterSetOnGround(MoverType pType, Vec3 pPos, CallbackInfo ci) {
+        Entity thisEntity = (Entity)(Object)this;
+        if (entQS(thisEntity)) {
+            thisEntity.setOnGround(true);
+        }
+    }
+
+}

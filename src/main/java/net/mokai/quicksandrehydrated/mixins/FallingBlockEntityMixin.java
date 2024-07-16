@@ -11,16 +11,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static net.mokai.quicksandrehydrated.util.ModTags.Blocks.QUICKSAND_DROWNABLE;
 
 @Mixin(FallingBlockEntity.class)
-public abstract class FallingBlockEntityMixin {
+public class FallingBlockEntityMixin {
 
-    @Shadow private boolean cancelDrop;
-    @Shadow BlockState blockState;
-
+    @Shadow
+    private boolean cancelDrop;
+    @Shadow
+    BlockState blockState;
 
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tick(CallbackInfo ci)
     {
-        //System.out.println(this.blockState.getTags().toList());
+        System.out.println(this.blockState.getTags().toList());
         if (this.blockState.getTags().toList().contains(QUICKSAND_DROWNABLE)) {
             this.cancelDrop = true; // setting cancelDrop will, later in the function, cause the item dropping to be skipped, and the onBrokenAfterFall method will fire instead without dropping an item.
         }

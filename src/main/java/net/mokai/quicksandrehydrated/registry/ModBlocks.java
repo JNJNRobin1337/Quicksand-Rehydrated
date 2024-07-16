@@ -42,12 +42,15 @@ public class ModBlocks {
 
     private final static BlockBehaviour.Properties baseBehavior = BlockBehaviour.Properties.copy(Blocks.SAND).noCollission().requiresCorrectToolForDrops()
             .noOcclusion().isViewBlocking((A, B, C) -> true);
+
+    // canOcclude
+
     private final static BlockBehaviour.Properties baseFlowingBehavior = BlockBehaviour.Properties.copy(Blocks.SAND).noCollission().requiresCorrectToolForDrops()
             .noOcclusion().isViewBlocking((A, B, C) -> A.getValue(FlowingQuicksandBase.LEVEL) >= 4);
     private final static BlockBehaviour.Properties slimeBehavior =BlockBehaviour.Properties.copy(Blocks.SLIME_BLOCK).noCollission().requiresCorrectToolForDrops()
             .noOcclusion().isViewBlocking((A, B, C) -> true);
 
-
+    public Block test = new Block(baseBehavior);
 
     public static final RegistryObject<Block> QUICKSAND = registerBlock("quicksand", () -> new Quicksand( baseBehavior, new QuicksandBehavior()
             .setCoverageTexture("quicksand_coverage")
@@ -67,7 +70,6 @@ public class ModBlocks {
 
     ));
     public static final RegistryObject<Block> SOFT_QUICKSAND = registerBlock("soft_quicksand", () -> new FlowingQuicksandBase(baseFlowingBehavior, new QuicksandBehavior()));
-
 
 
 
@@ -105,8 +107,7 @@ public class ModBlocks {
     }
 
     public static void register(IEventBus eventBus) {
-
         BLOCKS.register(eventBus);
-
     }
+
 }

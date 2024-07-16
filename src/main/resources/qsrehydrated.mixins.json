@@ -5,10 +5,10 @@
   "minVersion": "0",
   "mixins":
   [
-    "SlowdownMixin",
     "PlayerMixin",
     "FallingBlockEntityMixin",
-    "CanOccludeMixin"
+    "CanOccludeMixin",
+    "SlowdownMixin"
   ],
   "injectors": {
     "defaultRequire": 1

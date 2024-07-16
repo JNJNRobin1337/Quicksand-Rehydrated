@@ -4,10 +4,13 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
@@ -119,7 +122,10 @@ public class PlayerMixin implements playerStruggling {
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickStruggleCooldown(CallbackInfo ci)
     {
+
         Player player = (Player)(Object) this;
+        player.displayClientMessage(Component.literal("BLARGH"), false);
+
         entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar) player;
         playerStruggling strugglingPlayer = (playerStruggling) player;
 
