@@ -113,6 +113,28 @@ public class PlayerMixin implements playerStruggling {
 
     }
 
+    public Vec3 velPosition0 = new Vec3(0, 0, 0);
+    public Vec3 getVelPos0() {
+        return this.velPosition0;
+    }
+    public void setVelPos0(Vec3 set) {
+        this.velPosition0 = set;
+    }
+    public Vec3 velPosition1 = new Vec3(0, 0, 0);
+    public Vec3 getVelPos1() {
+        return this.velPosition1;
+    }
+    public void setVelPos1(Vec3 set) {
+        this.velPosition1 = set;
+    }
+
+
+    public Vec3 getVelocity() {
+        return this.velPosition0.subtract(this.velPosition1);
+    }
+
+
+
 
 
 
@@ -124,7 +146,9 @@ public class PlayerMixin implements playerStruggling {
     {
 
         Player player = (Player)(Object) this;
-        player.displayClientMessage(Component.literal("BLARGH"), false);
+
+        this.velPosition1 = this.velPosition0; // 1 = previous
+        this.velPosition0 = player.position(); // 0 = "current"
 
         entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar) player;
         playerStruggling strugglingPlayer = (playerStruggling) player;

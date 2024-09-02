@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.mokai.quicksandrehydrated.registry.ModModelLayers;
 
@@ -54,6 +55,8 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         this.texture.upload();
 
     }
+
+//    private void copyYLayer(Resource, int yLayer)
 
     public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, AbstractClientPlayer pAbstractPlayer, float pLimbSwing, float pLimbSwingAmount, float pPartialTick, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
 

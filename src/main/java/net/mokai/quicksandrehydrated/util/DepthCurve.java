@@ -67,7 +67,7 @@ public double getAt(double pos) {
         case LINEAR:    return ease(start, end, pos);
         case POW_IN:    return ease(start, end, Math.pow(pos, exp));
         case POW_OUT:   return ease(start, end, 1-Math.pow(1-pos, exp));
-        case POW_INOUT: return pos<.5 ? ease(start, end, Math.pow(pos*2, exp)/2) : ease(start, end, 1-Math.pow(2+pos*-2, exp)/2);
+        case POW_INOUT: return pos < .5 ? ease(start, end, Math.pow(pos*2, exp)/2) : ease(start, end, 1-Math.pow(2+pos*-2, exp)/2);
         case ARRAY:
 
             int len = array.length;
@@ -84,14 +84,12 @@ public double getAt(double pos) {
             int leftIndex = (int) Math.floor(scaledDouble);
             int rightIndex = leftIndex + 1;
 
-            double percent = scaledDouble - rightIndex;
+            double percent = rightIndex - scaledDouble;
+            double val = ease(array[leftIndex], array[rightIndex], percent);
 
-            return ease(array[leftIndex], array[rightIndex], percent);
-
+            return val;
 
         case CUSTOM:
-
-
 
         default: return 0d;
     }

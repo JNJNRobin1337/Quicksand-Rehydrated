@@ -175,20 +175,26 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
         // sinking is a replacement for gravity.
         Vec3 Momentum = pEntity.getDeltaMovement();
+
+        entityQuicksandVar entQS = (entityQuicksandVar) pEntity;
+
         boolean playerFlying = false;
         if (pEntity instanceof Player) {
             Player p = (Player) pEntity;
             playerFlying = p.getAbilities().flying;
         }
         if (!playerFlying) {
-            if (vert != 0.0) {
-                sink = sink / vert; // counteract vertical thickness (?)
-            }
-            Momentum = Momentum.add(0.0, -sink, 0.0);
+
+//            if (vert != 0.0) {
+//                sink = sink / vert; // counteract vertical thickness (?)
+//            }
+            Vec3 addVec = new Vec3(0, -sink, 0);
+            entQS.addQuicksandAdditive(addVec);
+
         }
 
-        Momentum = Momentum.multiply(walk, vert, walk);
-        pEntity.setDeltaMovement(Momentum);
+        Vec3 thicknessVector = new Vec3(walk, vert, walk);
+        entQS.multiOrSetQuicksandMultiplier(thicknessVector);
 
     }
 

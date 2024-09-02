@@ -34,4 +34,16 @@ public interface playerStruggling {
 
     void attemptStruggle();
 
+    Vec3 velPosition0 = new Vec3(0, 0, 0);
+    Vec3 getVelPos0();
+    void setVelPos0(Vec3 set);
+
+    Vec3 velPosition1 = new Vec3(0, 0, 0);
+    Vec3 getVelPos1();
+    void setVelPos1(Vec3 set);
+
+
+    Vec3 getVelocity();
+
+
 }

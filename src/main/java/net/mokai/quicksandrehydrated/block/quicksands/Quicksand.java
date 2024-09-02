@@ -12,6 +12,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBehavior;
+import net.mokai.quicksandrehydrated.entity.SinkModules.SinkQuicksand;
+import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +28,14 @@ public class Quicksand extends QuicksandBase {
     @Override
     public void firstTouch(Entity pEntity, Level pLevel) {
         trySetCoverage(pEntity);
+
+        entityQuicksandVar pQSEnt = (entityQuicksandVar)pEntity;
+
+        if (!pQSEnt.hasSinkModule(SinkQuicksand.class)) {
+            SinkQuicksand qs_module = new SinkQuicksand();
+            pQSEnt.addSinkModule(qs_module);
+        }
+
         if (pEntity.getDeltaMovement().y <= -0.333) {
             double mvt = pEntity.getDeltaMovement().y;
             mvt = clamp(mvt, -0.666, 0);
