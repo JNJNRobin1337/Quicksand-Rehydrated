@@ -2,7 +2,7 @@
   "replace": false,
   "values": [
     "qsrehydrated:quicksand",
-    "qsrehydrated:soft_quicksand",
-    "qsrehydrated:deep_mud"
+    "qsrehydrated:deep_mud",
+    "qsrehydrated:quickrug"
   ]
 }

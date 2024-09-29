@@ -42,7 +42,8 @@ public class FlowingQuicksandBase extends QuicksandBase implements QuicksandInte
 
     private final Random rng = new Random();
 
-    public FlowingQuicksandBase(Properties pProperties, QuicksandBehavior QSB) {super(pProperties, QSB);
+    public FlowingQuicksandBase(Properties pProperties, QuicksandBehavior QSB) {
+        super(pProperties, QSB);
         this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, 2));
     }
 

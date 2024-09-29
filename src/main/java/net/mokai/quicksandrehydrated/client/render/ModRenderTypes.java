@@ -6,15 +6,12 @@ import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
-import org.apache.commons.codec.language.bm.Rule;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
-public class MyRenderTypes
+public class ModRenderTypes
 {
 
     // TODO this should *NOT* be here

@@ -46,15 +46,17 @@ public class ModBlocks {
 
     private final static BlockBehaviour.Properties baseFlowingBehavior = BlockBehaviour.Properties.copy(Blocks.SAND).noCollission().requiresCorrectToolForDrops()
             .noOcclusion().isViewBlocking((A, B, C) -> A.getValue(FlowingQuicksandBase.LEVEL) >= 4);
-    private final static BlockBehaviour.Properties slimeBehavior =BlockBehaviour.Properties.copy(Blocks.SLIME_BLOCK).noCollission().requiresCorrectToolForDrops()
-            .noOcclusion().isViewBlocking((A, B, C) -> true);
+    private final static BlockBehaviour.Properties slimeBehavior = BlockBehaviour.Properties.copy(Blocks.SLIME_BLOCK).noCollission()
+            .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F);
+
+    private final static BlockBehaviour.Properties woolBehavior = BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).noCollission()
+            .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F);
 
 
-
-    public static final RegistryObject<Block> QUICKSAND = registerBlock("quicksand", () -> new Quicksand( baseBehavior, new QuicksandBehavior()
+    public static final RegistryObject<Block> QUICKSAND = registerBlock("quicksand", () -> new Quicksand( baseBehavior.randomTicks(), new QuicksandBehavior()
             .setCoverageTexture("quicksand_coverage")
-            .setSinkSpeed(.001d)
-            .setVertSpeed(.025d)
+            .setSinkSpeed(.0005d)
+            .setVertSpeed(.1d)
             .setWalkSpeed(new DepthCurve(0.9, 0.1))
     ));
 
@@ -71,8 +73,16 @@ public class ModBlocks {
     ));
 
 
+    public static final RegistryObject<Block> QUICKRUG = registerBlock("quickrug", () -> new Quickrug( woolBehavior, new QuicksandBehavior()
+            .setTugPointSpeed(0.025d)
+            .setTugStrengthHorizontal(new DepthCurve(0.08d, 0.06d))
+            .setVertSpeed(.4d)
+            .setSinkSpeed(new DepthCurve(new double[]{.001d, .000d, -.001d, .000d, .001d, .003d, .006d, .009d}))
+            .setWalkSpeed(new DepthCurve(1, .2))
+    ));
+
+
     static QuicksandBehavior mudSinkable = new QuicksandBehavior()
-            .setOffset(.125)
             .setVertSpeed(.5d)
             .setSinkSpeed(0);
 
@@ -102,6 +112,8 @@ public class ModBlocks {
         CREATIVELIST = new ArrayList<>();
         addItem(QUICKSAND);
         addItem(LIVING_SLIME);
+
+        addItem(QUICKRUG);
 
         addItem(THIN_MUD);
         addItem(SHALLOW_MUD);

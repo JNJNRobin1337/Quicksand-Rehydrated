@@ -3,16 +3,19 @@ package net.mokai.quicksandrehydrated;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingBreatheEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import net.mokai.quicksandrehydrated.loot.ModLootModifiers;
 import net.mokai.quicksandrehydrated.networking.ModMessages;
 import net.mokai.quicksandrehydrated.registry.*;
@@ -78,12 +81,39 @@ public class QuicksandRehydrated {
 
             Entity entity = event.getEntity();
             Vec3 eyePos = entity.getEyePosition();
-            BlockPos eyeBlockPos = new BlockPos((int) eyePos.x(), (int)eyePos.y(), (int)eyePos.z());
+            BlockPos eyeBlockPos = new BlockPos((int) Math.floor(eyePos.x()), (int) Math.floor(eyePos.y()), (int) Math.floor(eyePos.z()));
             BlockState eyeState = entity.level().getBlockState(eyeBlockPos);
 
             if (eyeState.is(QUICKSAND_DROWNABLE)) {
                 event.setCanBreathe(false);
             }
+
+        }
+
+        @SubscribeEvent
+        public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
+            // Your custom logic goes here
+            LivingEntity entity = event.getEntity();
+
+            if (entity.level().isClientSide()) {
+                System.out.print("[C] ");
+            }
+            else {
+                System.out.print("[S] ");
+            }
+
+            System.out.println(entity.getName() + " jumped!");
+
+            BlockPos onBlock = entity.getOnPosLegacy();
+            BlockState onState = entity.level().getBlockState(onBlock);
+
+            if (onState.getBlock() instanceof QuicksandBase) {
+
+                QuicksandBase quicksand = (QuicksandBase) onState.getBlock();
+                quicksand.sinkableJumpOff(onState, entity.level(), onBlock, entity);
+
+            }
+
 
         }
 

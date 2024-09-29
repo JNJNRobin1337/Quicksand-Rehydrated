@@ -1,0 +1,8 @@
+{
+    "parent": "qsrehydrated:block/layers/template/flowing_1",
+    "textures": {
+        "top": "qsrehydrated:block/soft_quicksand_top",
+		"side": "qsrehydrated:block/soft_quicksand_side",
+		"bottom": "qsrehydrated:block/soft_quicksand_bottom"
+    }
+}

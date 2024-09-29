@@ -3,6 +3,7 @@ package net.mokai.quicksandrehydrated.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 
 public class EasingHandler {
@@ -46,9 +47,26 @@ public class EasingHandler {
 
         do {
             currentHeight++;
+            BlockPos check = new BlockPos(pPos.getX(), (int) currentHeight, pPos.getZ());
+            playercube = check;
+        } while (pLevel.getBlockState(playercube).getBlock() instanceof QuicksandBase);
 
+        depth = playercube.getY() - playerY - offset;
 
+        return depth;
 
+    }
+
+    public static double getDepthPos(Vec3 worldPos, Level pLevel, BlockPos pPos, double offset) {
+
+        double playerY = worldPos.y();
+        double depth;
+
+        BlockPos playercube;
+        double currentHeight = pPos.getY();
+
+        do {
+            currentHeight++;
             BlockPos check = new BlockPos(pPos.getX(), (int) currentHeight, pPos.getZ());
             playercube = check;
         } while (pLevel.getBlockState(playercube).getBlock() instanceof QuicksandBase);
@@ -83,19 +101,18 @@ public class EasingHandler {
         double scaledDouble = val * indexMaximum;
 
         int leftIndex = (int) Math.floor(scaledDouble);
-        int rightIndex = leftIndex;
+        int rightIndex = leftIndex + 1;
 
-        double percent = (val * indexMaximum) - rightIndex;
+        double percent = rightIndex - scaledDouble;
 
         double leftNumber = listOfDoubles[leftIndex];
         double rightNumber = listOfDoubles[rightIndex];
 
-        return ease(leftNumber, rightNumber, percent);
+        return ease(leftNumber, rightNumber, 1-percent);
 
     }
 
     private static double ease(double start, double end, double pos) {
-
-        return (pos*(end-start))+start;
+        return start + ((end-start) * pos);
     }
 }

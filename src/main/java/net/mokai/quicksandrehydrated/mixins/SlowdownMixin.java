@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
-import net.mokai.quicksandrehydrated.entity.SinkModules.SinkDataInterface;
+import net.mokai.quicksandrehydrated.entity.sinkmodules.SinkData;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -62,21 +62,21 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
     @Shadow public abstract boolean shouldRender(double p_20296_, double p_20297_, double p_20298_);
 
-    List<SinkDataInterface> sinkData = new ArrayList<SinkDataInterface>();
+    List<SinkData> sinkData = new ArrayList<SinkData>();
 
-    public List<SinkDataInterface> getSinkData() {
+    public List<SinkData> getSinkData() {
         return sinkData;
     }
 
-    public void setSinkData(List<SinkDataInterface> set) {
+    public void setSinkData(List<SinkData> set) {
         sinkData = set;
     }
 
-    public void addSinkModule(SinkDataInterface addModule) {
+    public void addSinkModule(SinkData addModule) {
         sinkData.add(addModule);
     }
     public boolean hasSinkModule(Class<?> cls) {
-        for (SinkDataInterface module: sinkData) {
+        for (SinkData module: sinkData) {
             if (cls.equals(module.getClass())) {
                 return true;
             }
@@ -84,24 +84,33 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
         return false;
     }
 
+    public SinkData accessSinkModule(Class<?> cls) {
+        for (SinkData module: sinkData) {
+            if (cls.equals(module.getClass())) {
+                return module;
+            }
+        }
+        return null;
+    }
 
-//    public SinkDataInterface accessData(Class<?> cls) {
+
+//    public SinkData accessData(Class<?> cls) {
 //
 //        // in which I fuck around, and find out.
 //
 //        entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar)(Object)this;
-//        List<SinkDataInterface> sinkDataList = QuicksandVarEntity.getSinkData();
+//        List<SinkData> sinkDataList = QuicksandVarEntity.getSinkData();
 //
-//        for (SinkDataInterface module: sinkDataList) {
+//        for (SinkData module: sinkDataList) {
 //            if (cls.equals(module.getClass())) {
 //                return module;
 //            }
 //        }
 //
-//        // it is heavily encouraged that Class<?> should implement SinkDataInterface.
+//        // it is heavily encouraged that Class<?> should implement SinkData.
 //        try {
-//            // attempt to instantiate the SinkDataInterface
-//            SinkDataInterface sink = (SinkDataInterface) cls.getDeclaredConstructor().newInstance();
+//            // attempt to instantiate the SinkData
+//            SinkData sink = (SinkData) cls.getDeclaredConstructor().newInstance();
 //            sinkDataList.add(sink);
 //            return sink;
 //        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException err) {
@@ -117,12 +126,13 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
     public double horizontal = Double.MAX_VALUE;
     public double vertical = Double.MAX_VALUE;
 
-    public Vec3 previousPosition = new Vec3(0.0, 0.0, 0.0);
+    public Vec3 tugPosition = new Vec3(0.0, 0.0, 0.0);
+    public Vec3 getTugPosition() {return this.tugPosition;}
+    public void setTugPosition(Vec3 set) {this.tugPosition = set;}
 
-    public Vec3 getPreviousPosition() {return this.previousPosition;}
-    public void setPreviousPosition(Vec3 set) {this.previousPosition = set;}
-
-
+    public Vec3 tugMomentum = new Vec3(0.0, 0.0, 0.0);
+    public Vec3 getTugMomentum() {return this.tugMomentum;}
+    public void setTugMomentum(Vec3 set) {this.tugMomentum = set;}
 
 
     public boolean inQuicksand = false;
@@ -209,44 +219,24 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
         Entity thisEntity = (Entity)(Object)this;
         entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar)(Object)this;
 
-        List<SinkDataInterface> sinkDataList = QuicksandVarEntity.getSinkData();
+        List<SinkData> sinkDataList = QuicksandVarEntity.getSinkData();
         boolean shouldRefresh = false;
-
-        // execute tick function of every module
-        for (SinkDataInterface module: sinkDataList) {
-            if (!module.isStale()) {
-                module.generic_tick(thisEntity);
-            }
-            else {
-                shouldRefresh = true;
-            }
-        }
-
-        // then refresh and remove stale ones, only when needed
-        if (shouldRefresh) {
-            List<SinkDataInterface> newList = new ArrayList<SinkDataInterface>();
-            for (SinkDataInterface module : sinkDataList) {
-                if (!module.isStale()) {
-                    newList.add(module);
-                }
-            }
-            QuicksandVarEntity.setSinkData(newList);
-        }
-
-
 
         if (!QuicksandVarEntity.getInQuicksand()) {
             // if not in quicksand, move previous position directly to position
-            QuicksandVarEntity.setPreviousPosition(thisEntity.getPosition(0));
+//            QuicksandVarEntity.setTugPosition(thisEntity.getPosition(0));
 
             if (QuicksandVarEntity.getquicksandEnterFlag()) {
                 // set the enter flag to false as well
                 QuicksandVarEntity.setquicksandEnterFlag(false);
             }
 
-            for (SinkDataInterface module: sinkDataList) {
+            for (SinkData module: sinkDataList) {
                 if (!module.isStale()) {
                     module.non_quicksand_tick(thisEntity);
+                }
+                else {
+                    shouldRefresh = true;
                 }
             }
 
@@ -254,7 +244,7 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
         else {
 
             // white effect == previous position variable
-            //Vec3 PrevPos = QuicksandVarEntity.getPreviousPosition();
+            //Vec3 PrevPos = QuicksandVarEntity.getTugPosition();
             //thisEntity.getLevel().addParticle(ModParticles.QUICKSAND_BUBBLE_PARTICLES.get(), PrevPos.x(), PrevPos.y(), PrevPos.z(), 0.0D, 0.0D, 0.0D);
 
             BlockPos bp = getStuckBlock(thisEntity);
@@ -263,9 +253,12 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
                 Level eLevel = thisEntity.level();
                 BlockState bs = eLevel.getBlockState(bp);
 
-                for (SinkDataInterface module: sinkDataList) {
+                for (SinkData module: sinkDataList) {
                     if (!module.isStale()) {
                         module.quicksand_tick(thisEntity, bp, bs);
+                    }
+                    else {
+                        shouldRefresh = true;
                     }
                 }
 
@@ -274,6 +267,21 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
             }
 
+        }
+
+
+        // refresh and remove stale ones, only when needed
+        if (shouldRefresh) {
+            List<SinkData> newList = new ArrayList<SinkData>();
+            for (SinkData module : sinkDataList) {
+                if (!module.isStale()) {
+                    newList.add(module);
+                }
+                else {
+                    System.out.println("deleting a module.");
+                }
+            }
+            QuicksandVarEntity.setSinkData(newList);
         }
 
         // this is dumb?! why?

@@ -10,13 +10,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
-import net.mokai.quicksandrehydrated.client.render.MyRenderTypes;
+import net.mokai.quicksandrehydrated.client.render.ModRenderTypes;
 import net.mokai.quicksandrehydrated.client.render.StruggleHudOverlay;
 import net.mokai.quicksandrehydrated.client.render.coverage.CoverageAtlasHolder;
 import net.mokai.quicksandrehydrated.client.render.coverage.CoverageLayer;
 import net.mokai.quicksandrehydrated.client.render.coverage.PlayerCoverageDefaultModel;
 import net.mokai.quicksandrehydrated.client.render.coverage.PlayerCoverageSlimModel;
-import net.mokai.quicksandrehydrated.entity.playerStruggling;
 import net.mokai.quicksandrehydrated.registry.ModModelLayers;
 import net.mokai.quicksandrehydrated.util.Keybinding;
 
@@ -65,7 +64,7 @@ public class ClientEvents {
         {
             // Adds a shader to the list, the callback runs when loading is complete.
             event.registerShader(new ShaderInstance(event.getResourceProvider(), new ResourceLocation(QuicksandRehydrated.MOD_ID,"rendertype_coverage"), DefaultVertexFormat.NEW_ENTITY), (thang) -> {
-                MyRenderTypes.CustomRenderTypes.coverageShader = thang;
+                ModRenderTypes.CustomRenderTypes.coverageShader = thang;
             });
         }
 

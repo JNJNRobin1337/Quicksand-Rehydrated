@@ -1,16 +1,16 @@
 {
   "variants": {
     "level=1": {
-      "model": "qsrehydrated:block/layers/flowing_1"
+      "model": "qsrehydrated:block/layers/soft_quicksand_1"
     },
     "level=2": {
-      "model": "qsrehydrated:block/layers/flowing_2"
+      "model": "qsrehydrated:block/layers/soft_quicksand_2"
     },
     "level=3": {
-      "model": "qsrehydrated:block/layers/flowing_3"
+      "model": "qsrehydrated:block/layers/soft_quicksand_3"
     },
     "level=4": {
-      "model": "qsrehydrated:block/layers/flowing_4"
+      "model": "qsrehydrated:block/layers/soft_quicksand_4"
     }
   }
 }

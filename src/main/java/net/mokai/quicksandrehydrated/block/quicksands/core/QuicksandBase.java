@@ -144,10 +144,10 @@ public class QuicksandBase extends Block implements QuicksandInterface {
         Vec3 currentPos = pEntity.getPosition(0);
 
         // Get the Previous Position variable
-        Vec3 prevPos = es.getPreviousPosition();
+        Vec3 prevPos = es.getTugPosition();
 
         // move previous pos towards player by set amount
-        es.setPreviousPosition(prevPos.lerp(currentPos, getTugPointSpeed(depth)));
+        es.setTugPosition(prevPos.lerp(currentPos, getTugPointSpeed(depth)));
     }
 
     public void quicksandTug(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, double depth) {
@@ -156,7 +156,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
         entityQuicksandVar es = (entityQuicksandVar) pEntity;
 
         // the difference between the entity position, and the previous position.
-        Vec3 differenceVec = es.getPreviousPosition().subtract(pEntity.getPosition(0));
+        Vec3 differenceVec = es.getTugPosition().subtract(pEntity.getPosition(0));
 
         // apply momentum towards previous pos to entity
         double hor = getTugStrengthHorizontal(depth);
@@ -233,30 +233,26 @@ public class QuicksandBase extends Block implements QuicksandInterface {
             // Okay, so letting people jump on the top layer of the quicksand lets everyone just hold spacebar and jump over it all. I just commented it all out to disable it, and works better (tm)
 
             if (canStepOut(depth)) {
-                if (pLevel.getBlockState(pPos.above()).isAir()) {
 
-                    boolean playerFlying = false;
-                    if (pEntity instanceof Player) {
-                        Player p = (Player) pEntity;
-                        playerFlying = p.getAbilities().flying;
-                    }
-
-                    if (!playerFlying) {
-                        // if the player is flying ... they shouldn't be set on ground! cause then they
-                        // can't fly.
-                        // quicksand effects are still dealt, above, though.
-                        pEntity.setOnGround(true);
-                    }
-
+                boolean playerFlying = false;
+                if (pEntity instanceof Player) {
+                    Player p = (Player) pEntity;
+                    playerFlying = p.getAbilities().flying;
                 }
+
+                if (!playerFlying) {
+                    // if the player is flying ... they shouldn't be set on ground! cause then they
+                    // can't fly.
+                    // quicksand effects are still dealt, above, though.
+                    pEntity.setOnGround(true);
+                }
+
             } else {
                 // sets to false even if they're at bottom (touching block underneath the QS)
                 pEntity.setOnGround(false);
                 pEntity.resetFallDistance();
             }
 
-
-            pEntity.setOnGround(false);
             pEntity.resetFallDistance();
 
         }
@@ -272,8 +268,11 @@ public class QuicksandBase extends Block implements QuicksandInterface {
             }
         }
     }
-    public void firstTouch(Entity pEntity,Level pLevel) {
+    public void firstTouch(Entity pEntity, Level pLevel) {
         trySetCoverage(pEntity);
+        entityQuicksandVar es = (entityQuicksandVar) pEntity;
+        es.setTugMomentum(new Vec3(0, 0, 0));
+        es.setTugPosition(pEntity.getPosition(0));
     }
 
     public void struggleAttempt(@NotNull BlockState pState, @NotNull Entity pEntity, double struggleAmount) {
@@ -296,7 +295,6 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
         pEntity.level().playSound(pEntity, pEntity.blockPosition(), SoundEvents.SOUL_SOIL_STEP, SoundSource.BLOCKS, 0.25F, (pEntity.level().getRandom().nextFloat() * 0.1F) + 0.5F);
 
-
     }
 
     public void tryApplyCoverage(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Entity pEntity) {
@@ -313,6 +311,10 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
             }
         }
+    }
+
+    // special function for sinkables that runs when an entity jumps on, or in it.
+    public void sinkableJumpOff(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
     }
 
     @Override
