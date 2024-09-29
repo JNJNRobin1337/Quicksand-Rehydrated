@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "qsrehydrated:block/jungle_quicksand"
+      },
+      {
+        "model": "qsrehydrated:block/jungle_quicksand",
+        "y": 90
+      },
+      {
+        "model": "qsrehydrated:block/jungle_quicksand",
+        "y": 180
+      },
+      {
+        "model": "qsrehydrated:block/jungle_quicksand",
+        "y": 270
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "qsrehydrated:block/quicksand_1"
+    "all": "qsrehydrated:block/quicksand_2"
   }
 }

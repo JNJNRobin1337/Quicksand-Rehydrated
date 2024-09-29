@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "state=1": {
+      "model": "qsrehydrated:block/silt"
+    },
+    "state=2": {
+      "model": "qsrehydrated:block/silt_disturbed"
+    }
+  }
+}

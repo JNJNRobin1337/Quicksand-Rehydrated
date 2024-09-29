@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "qsrehydrated:block/silt_1",
+    "side": "qsrehydrated:block/silt_side_1"
+  }
+}
