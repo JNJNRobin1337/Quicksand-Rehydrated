@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
-import net.mokai.quicksandrehydrated.entity.sinkmodules.SinkData;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandEffectManager;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -26,8 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 import static net.mokai.quicksandrehydrated.util.ModTags.Blocks.QUICKSAND_DROWNABLE;
 
@@ -37,7 +35,16 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
     @Shadow
     protected Vec3 stuckSpeedMultiplier;
 
+
+
+    final QuicksandEffectManager quicksandEffectManager = new QuicksandEffectManager();
+    public QuicksandEffectManager getQuicksandEffectManager() {return this.quicksandEffectManager;}
+
+
     Vec3 quicksandMultiplier = Vec3.ZERO;
+
+
+
     public Vec3 getQuicksandMultiplier() {return this.quicksandMultiplier;}
     public void setQuicksandMultiplier(Vec3 set) {this.quicksandMultiplier = set;}
     public void multiOrSetQuicksandMultiplier(Vec3 set) {
@@ -62,62 +69,6 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
     @Shadow public abstract boolean shouldRender(double p_20296_, double p_20297_, double p_20298_);
 
-    List<SinkData> sinkData = new ArrayList<SinkData>();
-
-    public List<SinkData> getSinkData() {
-        return sinkData;
-    }
-
-    public void setSinkData(List<SinkData> set) {
-        sinkData = set;
-    }
-
-    public void addSinkModule(SinkData addModule) {
-        sinkData.add(addModule);
-    }
-    public boolean hasSinkModule(Class<?> cls) {
-        for (SinkData module: sinkData) {
-            if (cls.equals(module.getClass())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public SinkData accessSinkModule(Class<?> cls) {
-        for (SinkData module: sinkData) {
-            if (cls.equals(module.getClass())) {
-                return module;
-            }
-        }
-        return null;
-    }
-
-
-//    public SinkData accessData(Class<?> cls) {
-//
-//        // in which I fuck around, and find out.
-//
-//        entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar)(Object)this;
-//        List<SinkData> sinkDataList = QuicksandVarEntity.getSinkData();
-//
-//        for (SinkData module: sinkDataList) {
-//            if (cls.equals(module.getClass())) {
-//                return module;
-//            }
-//        }
-//
-//        // it is heavily encouraged that Class<?> should implement SinkData.
-//        try {
-//            // attempt to instantiate the SinkData
-//            SinkData sink = (SinkData) cls.getDeclaredConstructor().newInstance();
-//            sinkDataList.add(sink);
-//            return sink;
-//        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException err) {
-//            throw new RuntimeException("Failed to instantiate class " + cls.getName(), err);
-//        }
-//
-//    }
 
 
 
@@ -125,14 +76,6 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
     public boolean changed = false;
     public double horizontal = Double.MAX_VALUE;
     public double vertical = Double.MAX_VALUE;
-
-    public Vec3 tugPosition = new Vec3(0.0, 0.0, 0.0);
-    public Vec3 getTugPosition() {return this.tugPosition;}
-    public void setTugPosition(Vec3 set) {this.tugPosition = set;}
-
-    public Vec3 tugMomentum = new Vec3(0.0, 0.0, 0.0);
-    public Vec3 getTugMomentum() {return this.tugMomentum;}
-    public void setTugMomentum(Vec3 set) {this.tugMomentum = set;}
 
 
     public boolean inQuicksand = false;
@@ -145,13 +88,14 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
 
 
-    public boolean quicksandEnterFlag = false;
-    public boolean getquicksandEnterFlag() {
-        return this.quicksandEnterFlag;
+    public boolean enterQuicksandFlag = false;
+    public boolean getEnterQuicksandFlag() {
+        return this.enterQuicksandFlag;
     }
-    public void setquicksandEnterFlag(boolean set) {
-        this.quicksandEnterFlag = set;
+    public void setEnterQuicksandFlag(boolean set) {
+        this.enterQuicksandFlag = set;
     }
+
 
 
 
@@ -165,9 +109,22 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 //
 //    }
 
+    public boolean stuckBlockValid(BlockPos pPos, Entity pEntity) {
 
+        BlockState pState = pEntity.level().getBlockState(pPos);
 
+        if (pState.getBlock() instanceof QuicksandBase qs) {
 
+            double quicksandSurface = pPos.getY() + 1 - qs.getOffset(pState);
+            if (pEntity.position().y < quicksandSurface) {
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
 
 
 
@@ -181,9 +138,7 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
         Vec3 ePos = pEntity.position();
         Level eLevel = pEntity.level();
 
-        if (eLevel.getBlockState(pEntity.blockPosition()).getBlock() instanceof QuicksandBase) {
-            return pEntity.blockPosition();
-        }
+        if (stuckBlockValid(pEntity.blockPosition(), pEntity)) {return pEntity.blockPosition();}
 
         // offset into middle of current block.
 
@@ -195,18 +150,18 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
         // Should eventually change to a more sophisticated approach
         // that accurately gets the closest quicksand block, instead.
 
-        if (eLevel.getBlockState(blockPosOffset).getBlock() instanceof QuicksandBase) {
-            return blockPosOffset;
-        }
-        else if (eLevel.getBlockState(blockPosOffset.north()).getBlock() instanceof QuicksandBase) {
-            return  blockPosOffset.north();
-        }
-        else if (eLevel.getBlockState(blockPosOffset.west()).getBlock() instanceof QuicksandBase) {
-            return  blockPosOffset.west();
-        }
-        else if (eLevel.getBlockState(blockPosOffset.north().west()).getBlock() instanceof QuicksandBase) {
-            return blockPosOffset.north().west();
-        }
+        BlockPos checkPos = blockPosOffset;
+        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+
+        checkPos = blockPosOffset.north();
+        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+
+        checkPos = blockPosOffset.west();
+        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+
+        checkPos = blockPosOffset.north().west();
+        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+
         return null;
 
     }
@@ -217,77 +172,45 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
     private void tickEnd(CallbackInfo ci) {
 
         Entity thisEntity = (Entity)(Object)this;
-        entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar)(Object)this;
+        entityQuicksandVar qsE = (entityQuicksandVar)(Object)this;
 
-        List<SinkData> sinkDataList = QuicksandVarEntity.getSinkData();
-        boolean shouldRefresh = false;
-
-        if (!QuicksandVarEntity.getInQuicksand()) {
+        if (!qsE.getInQuicksand()) {
             // if not in quicksand, move previous position directly to position
-//            QuicksandVarEntity.setTugPosition(thisEntity.getPosition(0));
+            //  QuicksandVarEntity.setTugPosition(thisEntity.getPosition(0));
 
-            if (QuicksandVarEntity.getquicksandEnterFlag()) {
+            if (qsE.getEnterQuicksandFlag()) {
                 // set the enter flag to false as well
-                QuicksandVarEntity.setquicksandEnterFlag(false);
-            }
-
-            for (SinkData module: sinkDataList) {
-                if (!module.isStale()) {
-                    module.non_quicksand_tick(thisEntity);
-                }
-                else {
-                    shouldRefresh = true;
-                }
+                qsE.setEnterQuicksandFlag(false);
             }
 
         }
         else {
 
-            // white effect == previous position variable
-            //Vec3 PrevPos = QuicksandVarEntity.getTugPosition();
-            //thisEntity.getLevel().addParticle(ModParticles.QUICKSAND_BUBBLE_PARTICLES.get(), PrevPos.x(), PrevPos.y(), PrevPos.z(), 0.0D, 0.0D, 0.0D);
-
             BlockPos bp = getStuckBlock(thisEntity);
 
             if (bp != null) {
+
                 Level eLevel = thisEntity.level();
                 BlockState bs = eLevel.getBlockState(bp);
 
-                for (SinkData module: sinkDataList) {
-                    if (!module.isStale()) {
-                        module.quicksand_tick(thisEntity, bp, bs);
-                    }
-                    else {
-                        shouldRefresh = true;
-                    }
-                }
-
                 QuicksandBase qs = (QuicksandBase) bs.getBlock();
+
+                if (!qsE.getEnterQuicksandFlag()) {
+                    qsE.setEnterQuicksandFlag(true);
+                    qs.firstTouch(bp, thisEntity, thisEntity.level());
+                }
+                
                 qs.applyQuicksandEffects(bs, eLevel, bp, thisEntity);
 
             }
 
         }
 
-
-        // refresh and remove stale ones, only when needed
-        if (shouldRefresh) {
-            List<SinkData> newList = new ArrayList<SinkData>();
-            for (SinkData module : sinkDataList) {
-                if (!module.isStale()) {
-                    newList.add(module);
-                }
-                else {
-                    System.out.println("deleting a module.");
-                }
-            }
-            QuicksandVarEntity.setSinkData(newList);
-        }
-
         // this is dumb?! why?
-        QuicksandVarEntity.setInQuicksand(false);
+        qsE.setInQuicksand(false);
 
     }
+
 
 
     /**
@@ -378,7 +301,6 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
 
 
-
     public boolean entityCanStepOut(Entity pEntity) {
 
         Entity thisEntity = (Entity)(Object)this;
@@ -390,7 +312,7 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
 
             if (stuckBlock instanceof QuicksandBase) {
                 QuicksandBase qsBlock = (QuicksandBase) stuckBlock;
-                double depth = qsBlock.getDepth(thisEntity.level(), thisEntity.blockPosition(), thisEntity);
+                double depth = qsBlock.getDepth(thisEntity.level(), stuckBlockPos, thisEntity);
                 return qsBlock.canStepOut(depth);
             }
         }

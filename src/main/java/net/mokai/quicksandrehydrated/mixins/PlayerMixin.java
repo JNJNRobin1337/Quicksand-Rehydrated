@@ -10,7 +10,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
@@ -54,6 +53,7 @@ public class PlayerMixin implements playerStruggling {
 
     public String getCoverageTexture() {return coverageTexture;}
     public void setCoverageTexture(String set) {this.coverageTexture = set;}
+
 
 
 
@@ -154,7 +154,15 @@ public class PlayerMixin implements playerStruggling {
         playerStruggling strugglingPlayer = (playerStruggling) player;
 
         AttributeInstance gravity = player.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
-        if (QuicksandVarEntity.getInQuicksand()) {
+
+        boolean inQuicksand = QuicksandVarEntity.getInQuicksand();
+
+        if (inQuicksand) {
+            BlockPos stuckPos = QuicksandVarEntity.getStuckBlock(player);
+            inQuicksand = (stuckPos != null);
+        }
+
+        if (inQuicksand) {
             if (gravity != null && !gravity.hasModifier(GRAVITY_MODIFIER_QUICKSAND)) {
                 gravity.addTransientModifier(GRAVITY_MODIFIER_QUICKSAND);
             }

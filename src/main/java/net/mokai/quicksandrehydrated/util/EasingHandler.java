@@ -3,10 +3,17 @@ package net.mokai.quicksandrehydrated.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 
 public class EasingHandler {
+
+
+
+
+
+
 
     public static double lerp(double start, double end, double position) {
         position = Math.max(0, Math.min(position, 1)); // limits `position` to [0,1]

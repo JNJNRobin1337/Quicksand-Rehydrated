@@ -51,6 +51,12 @@ public class FlowingQuicksandBase extends QuicksandBase implements QuicksandInte
 
     // ------------------------------- Flowing specific ------------------------------------
 
+    @Override
+    public double getOffset(BlockState pState) {
+        return (1.0 - (pState.getValue(LEVEL)/4.0)) - QSBehavior.getOffset();
+    }
+
+
 
     public static final IntegerProperty LEVEL = IntegerProperty.create("level", 1, 4);
 

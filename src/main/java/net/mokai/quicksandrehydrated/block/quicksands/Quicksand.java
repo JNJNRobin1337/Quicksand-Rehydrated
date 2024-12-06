@@ -17,8 +17,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBehavior;
-import net.mokai.quicksandrehydrated.entity.sinkmodules.SinkQuickrug;
-import net.mokai.quicksandrehydrated.entity.sinkmodules.SinkQuicksand;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandEffect;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandEffectManager;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import net.mokai.quicksandrehydrated.util.DepthCurve;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
@@ -50,17 +50,11 @@ public class Quicksand extends QuicksandBase {
     public double getVertSpeed(double depth) {return .1d;}
 
     @Override
-    public void firstTouch(Entity pEntity, Level pLevel) {
+    public void firstTouch(BlockPos pPos, Entity pEntity, Level pLevel) {
 
-        super.firstTouch(pEntity, pLevel);
+        super.firstTouch(pPos, pEntity, pLevel);
 
         entityQuicksandVar pQSEnt = (entityQuicksandVar)pEntity;
-
-        SinkQuicksand dataModule;
-        if (!pQSEnt.hasSinkModule(SinkQuicksand.class)) {
-            dataModule = new SinkQuicksand();
-            pQSEnt.addSinkModule(dataModule);
-        }
 
         if (pEntity.getDeltaMovement().y <= -0.333) {
             double mvt = pEntity.getDeltaMovement().y;
@@ -71,29 +65,12 @@ public class Quicksand extends QuicksandBase {
 
     }
 
-    public SinkQuicksand accessDataModule(Entity pEntity) {
-
-        entityQuicksandVar es = (entityQuicksandVar) pEntity;
-
-        if (es.hasSinkModule(SinkQuicksand.class)) {
-            return (SinkQuicksand) es.accessSinkModule(SinkQuicksand.class);
-        }
-        else {
-            SinkQuicksand dataModule = new SinkQuicksand();
-            es.addSinkModule(dataModule);
-            return dataModule;
-        }
-
-    }
-
     @Override
     public void quicksandMomentum(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, double depth) {
 
         // get quicksand Variables
         double walk = getWalkSpeed(depth);
         double vert = getVertSpeed(depth);
-
-        SinkQuicksand data = accessDataModule(pEntity);
 
         double liquid = pState.getValue(LIQUEFACTION);
         liquid = (liquid/7.0d);
@@ -149,6 +126,15 @@ public class Quicksand extends QuicksandBase {
         double walk = getWalkSpeed(depth);
         entityQuicksandVar entQS = (entityQuicksandVar) pEntity;
         double liquid = pState.getValue(LIQUEFACTION);
+
+        System.out.print("{ ");
+        QuicksandEffectManager qsEffects = entQS.getQuicksandEffectManager();
+        for (QuicksandEffect effect : qsEffects.effects) {
+            System.out.print(effect.getClass().getSimpleName());
+            System.out.print(", ");
+        }
+        System.out.println(" }");
+
 
 
         // randomly play sounds

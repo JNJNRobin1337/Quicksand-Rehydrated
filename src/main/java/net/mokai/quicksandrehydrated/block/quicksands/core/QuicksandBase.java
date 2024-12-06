@@ -14,9 +14,11 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.mokai.quicksandrehydrated.entity.EntityBubble;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandEffect;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandEffectManager;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandWobbleEffect;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import net.mokai.quicksandrehydrated.entity.playerStruggling;
-import net.mokai.quicksandrehydrated.util.DepthCurve;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,7 +91,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
     /** How strongly the quicksand pulls the player horizontally towards the Tug point. 1 is full strength.
      * @return Horizontal tug strength. [0, 1]
      */
-    public double getTugStrengthHorizontal(double depth) {return QSBehavior.getTugStrengthHorizontal(depth);}
+    public double getWobbleTugHorizontal(double depth) {return QSBehavior.getWobbleTugHorizontal(depth);}
 
     /**
      * How strongly the quicksand pulls the player vertically towards the Tug point. 1 is full strength.
@@ -97,7 +99,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
      * @param depth
      * @return Vertical tug strength. [0, 1]
      */
-    public double getTugStrengthVertical(double depth) {return QSBehavior.getTugStrengthVertical(depth);}
+    public double getWobbleTugVertical(double depth) {return QSBehavior.getWobbleTugVertical(depth);}
 
     /** How quickly the TugLerp point approaches the player, as a percentage of the distance per tick.
      * You can think of this as how "sticky" the quicksand is.
@@ -106,7 +108,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
      * @param depth
      * @return Vertical tug strength. [0, 1]
      **/
-    public double getTugPointSpeed(double depth) {return QSBehavior.getTugPointSpeed(depth);}
+    public double getWobbleMove(double depth) {return QSBehavior.getWobbleMove(depth);}
 
     /** The lowest point the TugPoint will sink to.
      * @return The buoyancy depth.
@@ -135,36 +137,6 @@ public class QuicksandBase extends Block implements QuicksandInterface {
         return EasingHandler.getDepth(pEntity, pLevel, pPos, getOffset(pLevel.getBlockState(pPos)));
     }
 
-
-    // Don't override anything below unless you know what you're doing!
-    public void quicksandTugMove(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, double depth) {
-
-        entityQuicksandVar es = (entityQuicksandVar) pEntity;
-
-        Vec3 currentPos = pEntity.getPosition(0);
-
-        // Get the Previous Position variable
-        Vec3 prevPos = es.getTugPosition();
-
-        // move previous pos towards player by set amount
-        es.setTugPosition(prevPos.lerp(currentPos, getTugPointSpeed(depth)));
-    }
-
-    public void quicksandTug(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, double depth) {
-
-        Vec3 Momentum = pEntity.getDeltaMovement();
-        entityQuicksandVar es = (entityQuicksandVar) pEntity;
-
-        // the difference between the entity position, and the previous position.
-        Vec3 differenceVec = es.getTugPosition().subtract(pEntity.getPosition(0));
-
-        // apply momentum towards previous pos to entity
-        double hor = getTugStrengthHorizontal(depth);
-        double vert = getTugStrengthVertical(depth);
-        Vec3 addMomentum = differenceVec.multiply(new Vec3(hor, vert, hor));
-        pEntity.setDeltaMovement(Momentum.add(addMomentum));
-
-    }
 
     public void quicksandMomentum(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, double depth) {
 
@@ -213,17 +185,22 @@ public class QuicksandBase extends Block implements QuicksandInterface {
             // first, the quicksand's main effects are applied. Thickness and sinking.
             quicksandMomentum(pState, pLevel, pPos, pEntity, depth);
 
-            // the next two deal with the entity's "Previous Position" variable.
-            // This can be used in different ways to get different effects.
 
-            // first the player is pushed towards this position a small amount
-            quicksandTug(pState, pLevel, pPos, pEntity, depth);
 
-            // then we move that position a little bit towards the player
-            quicksandTugMove(pState, pLevel, pPos, pEntity, depth);
+            // magic stuff to do fun effects ...
+            entityQuicksandVar qsE = (entityQuicksandVar) pEntity;
 
-            // By default, the tug position is constantly set to the entity's position, no
-            // force is applied on the entity towards the position.
+            // TODO Move this to using a map instead of an array?
+            // instead of just adding all the effects at the beginning, and blindly running all the effects the entity has,
+            // should probably instead check for all the ones that Should be there, and run those
+            // and add them if they don't exist
+            for (QuicksandEffect e : qsE.getQuicksandEffectManager().effects) {
+                e.effectEntity(pPos, pEntity, getQuicksandBehavior());
+            }
+
+
+
+
 
             // Some movement stuff. Dealing with whether the entity is "OnGround"
             // whether they can jump, and step out onto a solid block.
@@ -268,11 +245,25 @@ public class QuicksandBase extends Block implements QuicksandInterface {
             }
         }
     }
-    public void firstTouch(Entity pEntity, Level pLevel) {
+    public void firstTouch(BlockPos pPos, Entity pEntity, Level pLevel) {
         trySetCoverage(pEntity);
         entityQuicksandVar es = (entityQuicksandVar) pEntity;
-        es.setTugMomentum(new Vec3(0, 0, 0));
-        es.setTugPosition(pEntity.getPosition(0));
+
+        QuicksandBehavior qb = getQuicksandBehavior();
+
+        QuicksandEffectManager qEM = es.getQuicksandEffectManager();
+
+        qEM.clear();
+
+        System.out.print("Adding Quicksand Effects for ");
+        System.out.print(getClass().getSimpleName());
+        System.out.println(" ... ");
+        for (Class<? extends QuicksandEffect> e : qb.effectsList) {
+            System.out.print("  + ");
+            System.out.println(e.getSimpleName());
+            qEM.addEffect(e, pPos, pEntity);
+        }
+
     }
 
     public void struggleAttempt(@NotNull BlockState pState, @NotNull Entity pEntity, double struggleAmount) {
@@ -336,12 +327,6 @@ public class QuicksandBase extends Block implements QuicksandInterface {
             // more movement variables.
             es.setInQuicksand(true);
 
-            if (!es.getquicksandEnterFlag()) {
-                // if the enter flag isn't set - this entity entered quicksand
-                firstTouch(pEntity, pLevel);
-                es.setquicksandEnterFlag(true);
-            }
-
             pEntity.resetFallDistance();
 
             tryApplyCoverage(pState, pLevel, pPos, pEntity);
@@ -384,5 +369,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
         return pState.getTags().toList().contains(QUICKSAND_DROWNABLE)
                 || pState.getFluidState().getTags().toList().contains(QUICKSAND_DROWNABLE_FLUID);
     }
+
+
 
 }

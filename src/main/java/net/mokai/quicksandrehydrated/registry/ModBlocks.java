@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -15,7 +16,9 @@ import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.mokai.quicksandrehydrated.block.*;
 import net.mokai.quicksandrehydrated.block.quicksands.*;
 import net.mokai.quicksandrehydrated.block.quicksands.core.FlowingQuicksandBase;
+import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBehavior;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandWobbleEffect;
 import net.mokai.quicksandrehydrated.util.DepthCurve;
 
 
@@ -53,6 +56,7 @@ public class ModBlocks {
             .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F);
 
 
+
     public static final RegistryObject<Block> QUICKSAND = registerBlock("quicksand", () -> new Quicksand( baseBehavior.randomTicks(), new QuicksandBehavior()
             .setCoverageTexture("quicksand_coverage")
             .setSinkSpeed(.0005d)
@@ -64,26 +68,31 @@ public class ModBlocks {
 
 
 
-    public static final RegistryObject<Block> LIVING_SLIME = registerBlock("living_slime", () -> new LivingSlime( slimeBehavior, new QuicksandBehavior()
-            .setTugPointSpeed(0.025d)
-            .setTugStrengthHorizontal(new DepthCurve(0.08d, 0.06d))
-            .setVertSpeed(.4d)
-            .setSinkSpeed(new DepthCurve(new double[]{.001d, .000d, -.001d, .000d, .001d, .003d, .006d, .009d}))
-            .setWalkSpeed(new DepthCurve(1, .2))
+//    public static final RegistryObject<Block> LIVING_SLIME = registerBlock("living_slime", () -> new LivingSlime( slimeBehavior, new QuicksandBehavior()
+//            .setWobbleMove(0.025d)
+//            .setWobbleTugHorizontal(new DepthCurve(0.08d, 0.06d))
+//            .setVertSpeed(.4d)
+//            .setSinkSpeed(new DepthCurve(new double[]{.001d, .000d, -.001d, .000d, .001d, .003d, .006d, .009d}))
+//            .setWalkSpeed(new DepthCurve(1, .2))
+//    ));
+
+        public static final RegistryObject<Block> LIVING_SLIME = registerBlock("living_slime", () -> new QuicksandBase( slimeBehavior, new QuicksandBehavior()
+            .setSinkSpeed(0.001d)
+            .setWalkSpeed(new DepthCurve(new double[]{1d, 0.75d}))
+            .setVertSpeed(0.85d)
+            .setWobbleMove(new DepthCurve(new double[]{0.01d, 0.001d}))
+            .setWobbleTugHorizontal(0.1)
+            .setWobbleTugVertical(0.1)
+
+            .addQuicksandEffect(QuicksandWobbleEffect.class)
     ));
 
 
-    public static final RegistryObject<Block> QUICKRUG = registerBlock("quickrug", () -> new Quickrug( woolBehavior, new QuicksandBehavior()
-            .setTugPointSpeed(0.025d)
-            .setTugStrengthHorizontal(new DepthCurve(0.08d, 0.06d))
-            .setVertSpeed(.4d)
-            .setSinkSpeed(new DepthCurve(new double[]{.001d, .000d, -.001d, .000d, .001d, .003d, .006d, .009d}))
-            .setWalkSpeed(new DepthCurve(1, .2))
-    ));
 
 
     static QuicksandBehavior mudSinkable = new QuicksandBehavior()
-            .setVertSpeed(.5d)
+            .setVertSpeed(0.4)
+            .setWalkSpeed(new DepthCurve(new double[]{0.9, 0.55, 0.15, 0.1, 0.0}))
             .setSinkSpeed(0);
 
     public static final RegistryObject<Block> THIN_MUD = registerBlock("thin_mud", () -> new DeepMudBlock( baseBehavior.sound(SoundType.MUD), mudSinkable, 0.2d));
@@ -101,6 +110,24 @@ public class ModBlocks {
 
 
 
+    static QuicksandBehavior quickrugSinkable = new QuicksandBehavior()
+            .setVertSpeed(new DepthCurve(new double[]{.800d,          .600d,          .200d,          .100d,          .050d,  }))
+            .setSinkSpeed(new DepthCurve(new double[]{.001d,  .00133d, .000d,.000d,   .000d,   .000d, .000d, .000d,   .000d,  }))
+            .setWalkSpeed(new DepthCurve(new double[]{.900d,   .675d, .450d, .300d,   .100d,   .050d, .040d, .030d,   .020d,  }))
+
+            .setWobbleMove(0.025d)
+            .setWobbleTugHorizontal(new DepthCurve(0.08d, 0.06d))
+
+            .setWobbleMove(new DepthCurve(new double[]{0.2d, 0.01d}))
+            .setWobbleTugHorizontal(0.1)
+            .setWobbleTugVertical(0.1)
+
+            .addQuicksandEffect(QuicksandWobbleEffect.class);
+
+
+
+
+
     // ----------------------------------- Done! -----------------------------
 
 
@@ -111,9 +138,6 @@ public class ModBlocks {
     public static Collection<ItemStack> setupCreativeGroups() {
         CREATIVELIST = new ArrayList<>();
         addItem(QUICKSAND);
-        addItem(LIVING_SLIME);
-
-        addItem(QUICKRUG);
 
         addItem(THIN_MUD);
         addItem(SHALLOW_MUD);
@@ -121,6 +145,12 @@ public class ModBlocks {
         addItem(BOTTOMLESS_MUD);
 
         addItem(SOFT_QUICKSAND);
+
+        addItem(LIVING_SLIME);
+
+
+
+
         addItem(MIXER);
         return CREATIVELIST;
     }
@@ -140,5 +170,7 @@ public class ModBlocks {
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
     }
+
+
 
 }

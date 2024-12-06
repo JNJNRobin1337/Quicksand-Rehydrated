@@ -1,6 +1,10 @@
 package net.mokai.quicksandrehydrated.util;
 import net.minecraft.client.renderer.entity.ArrowRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
+import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import org.checkerframework.checker.units.qual.A;
 import org.joml.Vector2d;
 
@@ -19,6 +23,12 @@ public class DepthCurve {
     public double exp;
     public double[] array;
     public ArrayList<Vector2d> points;
+
+
+
+
+
+
 
 
     public DepthCurve (double constant) {
@@ -85,7 +95,7 @@ public double getAt(double pos) {
             int rightIndex = leftIndex + 1;
 
             double percent = rightIndex - scaledDouble;
-            double val = ease(array[leftIndex], array[rightIndex], percent);
+            double val = ease(array[rightIndex], array[leftIndex], percent);
 
             return val;
 

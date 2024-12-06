@@ -3,7 +3,8 @@ package net.mokai.quicksandrehydrated.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.mokai.quicksandrehydrated.entity.sinkmodules.SinkData;
+import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandEffectManager;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 
 public interface entityQuicksandVar {
 
+    QuicksandEffectManager getQuicksandEffectManager();
 
     Vec3 quicksandMultiplier = Vec3.ZERO;
     Vec3 getQuicksandMultiplier();
@@ -27,13 +29,6 @@ public interface entityQuicksandVar {
 
 
 
-    List<SinkData> sinkData = new ArrayList<SinkData>();
-    List<SinkData> getSinkData();
-    void setSinkData(List<SinkData> set);
-    void addSinkModule(SinkData addModule);
-    boolean hasSinkModule(Class<?> cls);
-
-    SinkData accessSinkModule(Class<?> cls);
 
 
 
@@ -56,9 +51,9 @@ public interface entityQuicksandVar {
 
 
 
-    boolean quicksandEnterFlag = false;
-    boolean getquicksandEnterFlag();
-    void setquicksandEnterFlag(boolean set);
+    boolean enterQuicksandFlag = false;
+    boolean getEnterQuicksandFlag();
+    void setEnterQuicksandFlag(boolean set);
 
 
 

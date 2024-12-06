@@ -95,14 +95,13 @@ public class QuicksandRehydrated {
             // Your custom logic goes here
             LivingEntity entity = event.getEntity();
 
-            if (entity.level().isClientSide()) {
-                System.out.print("[C] ");
-            }
-            else {
-                System.out.print("[S] ");
-            }
-
-            System.out.println(entity.getName() + " jumped!");
+//            if (entity.level().isClientSide()) {
+//                System.out.print("[C] ");
+//            }
+//            else {
+//                System.out.print("[S] ");
+//            }
+//            System.out.println(entity.getName() + " jumped!");
 
             BlockPos onBlock = entity.getOnPosLegacy();
             BlockState onState = entity.level().getBlockState(onBlock);

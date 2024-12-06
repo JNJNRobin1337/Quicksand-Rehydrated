@@ -29,8 +29,6 @@ public class StruggleReleaseC2SPacket {
 
             playerStruggling strugglingPlayer = (playerStruggling) player;
 
-            System.out.println("<Server>: Struggle Released");
-
             strugglingPlayer.attemptStruggle();
             strugglingPlayer.setHoldingStruggle(false);
 

@@ -45,7 +45,6 @@ public class QuicksandPotion extends PotionItem {
 
         if (!pLevel.isClientSide) {
             MobEffectInstance MEI = new MobEffectInstance(MobEffect.byId(2));
-            System.out.println(MobEffect.byId(2));
             MEI.getEffect().applyInstantenousEffect(player, player, pEntityLiving, MEI.getAmplifier(), 1);
             /*
             for(MobEffectInstance mobeffectinstance : PotionUtils.getMobEffects(pStack)) {

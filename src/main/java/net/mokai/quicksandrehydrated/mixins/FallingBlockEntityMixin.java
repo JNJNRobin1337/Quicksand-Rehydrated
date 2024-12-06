@@ -21,9 +21,10 @@ public class FallingBlockEntityMixin {
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tick(CallbackInfo ci)
     {
-        System.out.println(this.blockState.getTags().toList());
         if (this.blockState.getTags().toList().contains(QUICKSAND_DROWNABLE)) {
-            this.cancelDrop = true; // setting cancelDrop will, later in the function, cause the item dropping to be skipped, and the onBrokenAfterFall method will fire instead without dropping an item.
+            this.cancelDrop = true;
+            // setting cancelDrop will, later in the function, cause the item dropping to be skipped.
+            // the onBrokenAfterFall method will fire instead, without dropping an item.
         }
     }
 

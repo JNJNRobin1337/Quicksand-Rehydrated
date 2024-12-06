@@ -8,14 +8,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RedStoneOreBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBehavior;
 import net.mokai.quicksandrehydrated.entity.EntityBubble;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
-import net.mokai.quicksandrehydrated.registry.ModParticles;
 import net.mokai.quicksandrehydrated.util.BodyDepthThreshold;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +21,6 @@ import org.joml.Vector3f;
 
 import java.util.Random;
 
-import static net.mokai.quicksandrehydrated.registry.ModParticles.QUICKSAND_BUBBLE_PARTICLES;
 import static org.joml.Math.*;
 
 public class DeepMudBlock extends QuicksandBase {
@@ -53,45 +50,9 @@ public class DeepMudBlock extends QuicksandBase {
         return depthRaw >= STUCK_DEPTH.depth;
     }
 
-    @Override
-    public double getWalkSpeed(double depthRaw) {
 
-        double val = EasingHandler.doubleListInterpolate(depthRaw/2, new double[]{0.9, 0.55, 0.15, 0.1, 0.0});
-        return val;
 
-//        if (!depthIsStuck(depthRaw)) {
-//            return 0.99;
-//        }
-//        else {
-//            double normalDepth = (depthRaw- STUCK_DEPTH.depth) / (2- STUCK_DEPTH.depth); // start the array at knee depth
-//            return EasingHandler.doubleListInterpolate(normalDepth, new double[]{0.6, 0.35, 0.1, 0.0, 0.0});
-//        }
-    }
 
-    @Override
-    public double getVertSpeed(double depthRaw) {
-        return 0.4d;
-//        if (!depthIsStuck(depthRaw)) {
-//            return 0.3;
-//        } else {
-//            return interpolateAfterKnee(depthRaw, .3, .1);
-//        }
-    }
-
-    @Override
-    public double getTugPointSpeed(double depthRaw) {
-
-        return 1.0;
-
-//        if (!depthIsStuck(depthRaw)) {
-//            return 1.0; // go right to player if above
-//        }
-//        else {
-//            return 0.001;
-//            //double normalDepth = (depthRaw-stuckDepth) / (2-stuckDepth); // start the array at knee depth
-//            //return EasingHandler.doubleListInterpolate(normalDepth, new double[]{0.001}); // player not allowed to move
-//        }
-    }
 
     public boolean canStepOut(double depth) {
         return depth < 0.125d;
@@ -105,18 +66,6 @@ public class DeepMudBlock extends QuicksandBase {
 
 
 
-    @Override
-    public double getTugStrengthHorizontal(double depthRaw) {
-        return 0.0d;
-//        if (!depthIsStuck(depthRaw)) {
-//            return 0.0; // go right to player if above
-//        } else {
-//            return interpolateAfterKnee(depthRaw, 0.15, 0.3);
-//        }
-    }
-    public double getTugStrengthVertical(double depth) {
-        return 0.0d;
-    }
 
 
     @Override
@@ -150,7 +99,6 @@ public class DeepMudBlock extends QuicksandBase {
             double momentum = momentumVec3.length();
 
             double momentumValue = momentumVec3.length()*100;
-
 
             // if they're moving, turn some of their horizontal momentum into sinking
             if (momentumValue > 0.0001) {
@@ -199,33 +147,11 @@ public class DeepMudBlock extends QuicksandBase {
 
             }
 
-
-
         }
 
     }
 
-    @Override
-    public void quicksandTugMove(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, double depth) {
 
-        entityQuicksandVar es = (entityQuicksandVar) pEntity;
-        Vec3 currentPos = pEntity.getPosition(0);
-
-        // Get the Previous Position variable
-        Vec3 prevPos = es.getTugPosition();
-
-        double lerpAmountHorizontal = getTugPointSpeed(depth);
-
-        Vec3 newPrevPos = new Vec3(
-            lerp(prevPos.x(), currentPos.x(), lerpAmountHorizontal),
-            lerp(prevPos.y(), currentPos.y(), 1.0), // always go right to player Y level
-            lerp(prevPos.z(), currentPos.z(), lerpAmountHorizontal)
-        );
-
-        // move previous pos towards player by set amount
-        es.setTugPosition(newPrevPos);
-
-    }
 
     public void slurpEntity(@NotNull BlockState pState, @NotNull Entity pEntity) {
 
@@ -276,11 +202,10 @@ public class DeepMudBlock extends QuicksandBase {
 
     // normal block things v
 
-
     @Override
-    public void firstTouch(Entity pEntity, Level pLevel) {
+    public void firstTouch(BlockPos pPos, Entity pEntity, Level pLevel) {
 
-        super.firstTouch(pEntity, pLevel);
+        super.firstTouch(pPos, pEntity, pLevel);
 
         entityQuicksandVar es = (entityQuicksandVar) pEntity;
 
