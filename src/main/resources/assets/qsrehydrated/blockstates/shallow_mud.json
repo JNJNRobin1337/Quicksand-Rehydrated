@@ -2,18 +2,18 @@
   "variants": {
     "": [
       {
-        "model": "qsrehydrated:block/deep_mud"
+        "model": "qsrehydrated:block/mud"
       },
       {
-        "model": "qsrehydrated:block/deep_mud",
+        "model": "qsrehydrated:block/mud",
         "y": 90
       },
       {
-        "model": "qsrehydrated:block/deep_mud",
+        "model": "qsrehydrated:block/mud",
         "y": 180
       },
       {
-        "model": "qsrehydrated:block/deep_mud",
+        "model": "qsrehydrated:block/mud",
         "y": 270
       }
     ]
