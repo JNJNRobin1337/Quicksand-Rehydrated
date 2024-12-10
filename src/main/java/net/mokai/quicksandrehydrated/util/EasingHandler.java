@@ -6,6 +6,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
+import org.joml.Vector2d;
+
+import java.util.ArrayList;
+
+import static org.joml.Math.clamp;
 
 public class EasingHandler {
 
@@ -119,7 +124,60 @@ public class EasingHandler {
 
     }
 
+    public static double vector2dArrayInterpolate(double val, ArrayList<Vector2d> points) {
+
+        int len = points.size();
+        if (points.size() == 0) {
+            throw new IndexOutOfBoundsException("Cannot interpolate into an empty list. What would the correct default value be?");
+        } else if (len == 1 || val == 0) {
+            return points.get(0).x;
+        } else if (val == 1.0) {
+            return points.get(len-1).x;
+        } else if (val > points.get(len-1).y) {
+            return points.get(len-1).x;
+        }
+
+        int startIndex = 0;
+        int endIndex = len-1;
+
+        while (endIndex-startIndex > 1) {
+
+            int middle = (startIndex+endIndex) / 2;
+
+            if (val < points.get(middle).y()) {
+                endIndex = middle;
+            }
+            else if (val > points.get(middle).y()) {
+                startIndex = middle;
+            }
+
+        }
+
+        return ease(points.get(startIndex), points.get(endIndex), val);
+
+    }
+
     private static double ease(double start, double end, double pos) {
         return start + ((end-start) * pos);
     }
+
+    private static double ease(Vector2d start, Vector2d end, double pos) {
+
+        if (start.y() == end.y()) {
+            return 1.0d;
+        }
+
+        double posPos = clamp(start.y(), end.y(), pos) - start.y();
+        double posEnd = end.y() - start.y();
+        // pos Start can be treated as 0
+
+        // then, scale posEnd to 1 (move posPos accordingly)
+        posPos = (1.0/posEnd) * posPos;
+        posEnd = 1.0;
+
+        double val = ease(start.x(), end.x(), posPos);
+        return val;
+
+    }
+
 }

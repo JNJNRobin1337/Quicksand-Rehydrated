@@ -44,7 +44,7 @@ public class FlowingQuicksandBase extends QuicksandBase implements QuicksandInte
 
     public FlowingQuicksandBase(Properties pProperties, QuicksandBehavior QSB) {
         super(pProperties, QSB);
-        this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, 2));
+        this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, 1));
     }
 
 

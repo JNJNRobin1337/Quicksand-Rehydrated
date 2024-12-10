@@ -5,7 +5,6 @@
     "qsrehydrated:thin_mud",
     "qsrehydrated:shallow_mud",
     "qsrehydrated:deep_mud",
-    "qsrehydrated:bottomless_mud",
-    "qsrehydrated:quickrug"
+    "qsrehydrated:bottomless_mud"
   ]
 }

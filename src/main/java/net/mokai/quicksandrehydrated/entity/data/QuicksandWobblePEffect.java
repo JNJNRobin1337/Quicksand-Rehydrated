@@ -5,17 +5,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.mokai.quicksandrehydrated.block.quicksands.Quicksand;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBehavior;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
 
-public class QuicksandWobbleEffect extends QuicksandEffect {
+public class QuicksandWobblePEffect extends QuicksandEffect {
 
     public Vec3 wobblePosition;
 
-    public QuicksandWobbleEffect(BlockPos quicksandPos, Entity pEntity) {
+    public QuicksandWobblePEffect(BlockPos quicksandPos, Entity pEntity) {
         super(quicksandPos, pEntity);
         this.wobblePosition = pEntity.getPosition(0);
     }
@@ -45,8 +44,6 @@ public class QuicksandWobbleEffect extends QuicksandEffect {
 
             // the difference between the entity position, and the wobble pos.
             Vec3 differenceVec = wobblePosition.subtract(pEntity.getPosition(0));
-
-            System.out.println(differenceVec.toString());
 
             // apply momentum towards wobble pos to entity
 

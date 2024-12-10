@@ -3,9 +3,7 @@ package net.mokai.quicksandrehydrated.registry;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,13 +16,17 @@ import net.mokai.quicksandrehydrated.block.quicksands.*;
 import net.mokai.quicksandrehydrated.block.quicksands.core.FlowingQuicksandBase;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBehavior;
-import net.mokai.quicksandrehydrated.entity.data.QuicksandWobbleEffect;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandWobbleMEffect;
+import net.mokai.quicksandrehydrated.entity.data.QuicksandWobblePEffect;
 import net.mokai.quicksandrehydrated.util.DepthCurve;
 
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
+
+import static net.mokai.quicksandrehydrated.util.DepthCurve.Vec2;
 
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, QuicksandRehydrated.MOD_ID);
@@ -33,8 +35,6 @@ public class ModBlocks {
 
 
     //public static final RegistryObject<Block> SOFT_COVER = registerBlock("loose_moss", () -> new GoundCover(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
-
-
 
 
 
@@ -53,8 +53,7 @@ public class ModBlocks {
             .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F);
 
     private final static BlockBehaviour.Properties woolBehavior = BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).noCollission()
-            .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F);
-
+            .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F).forceSolidOn();
 
 
     public static final RegistryObject<Block> QUICKSAND = registerBlock("quicksand", () -> new Quicksand( baseBehavior.randomTicks(), new QuicksandBehavior()
@@ -84,7 +83,7 @@ public class ModBlocks {
             .setWobbleTugHorizontal(0.1)
             .setWobbleTugVertical(0.1)
 
-            .addQuicksandEffect(QuicksandWobbleEffect.class)
+            .addQuicksandEffect(QuicksandWobblePEffect.class)
     ));
 
 
@@ -101,30 +100,59 @@ public class ModBlocks {
     public static final RegistryObject<Block> BOTTOMLESS_MUD = registerBlock("bottomless_mud", () -> new DeepMudBlock( baseBehavior.sound(SoundType.MUD), mudSinkable, 2.5d));
 
 
-    
     public static final RegistryObject<Block> SOFT_QUICKSAND = registerBlock("soft_quicksand", () -> new FlowingQuicksandBase(baseFlowingBehavior, new QuicksandBehavior()));
 
 
 
 
 
-
-
     static QuicksandBehavior quickrugSinkable = new QuicksandBehavior()
-            .setVertSpeed(new DepthCurve(new double[]{.800d,          .600d,          .200d,          .100d,          .050d,  }))
-            .setSinkSpeed(new DepthCurve(new double[]{.001d,  .00133d, .000d,.000d,   .000d,   .000d, .000d, .000d,   .000d,  }))
-            .setWalkSpeed(new DepthCurve(new double[]{.900d,   .675d, .450d, .300d,   .100d,   .050d, .040d, .030d,   .020d,  }))
 
-            .setWobbleMove(0.025d)
-            .setWobbleTugHorizontal(new DepthCurve(0.08d, 0.06d))
+            .setVertSpeed(new ArrayList<>(List.of(
+                Vec2(0.3, 0.0),
+                Vec2(0.1, 0.35/2.0),
+                Vec2(0.05, 1.0/2.0)
+            )))
 
-            .setWobbleMove(new DepthCurve(new double[]{0.2d, 0.01d}))
-            .setWobbleTugHorizontal(0.1)
-            .setWobbleTugVertical(0.1)
+            .setSinkSpeed(new ArrayList<>(List.of(
+                Vec2(0.002, 0.0),
+                Vec2(0.0014, 0.3/2.0),
+                Vec2(0.0003, 0.4/2.0),
+                Vec2(0.0003, 1.0/2.0)
+            )))
 
-            .addQuicksandEffect(QuicksandWobbleEffect.class);
+            .setWalkSpeed(new ArrayList<>(List.of(
+                Vec2(1.0, 0.0),
+                Vec2(0.9, 0.35/2.0),
+                Vec2(0.1, 0.5/2.0),
+                Vec2(0.0, 1.0/2.0)
+            )))
 
+            .setWobbleMove(0.9d)
+            .setWobbleDecay(0.94d)
+            .setWobbleRebound(0.4d/20.0d)
+            .setWobbleApply(-0.5d/20.0d)
 
+            .setStepOutHeight(0.25d)
+
+            .addQuicksandEffect(QuicksandWobbleMEffect.class);
+
+    public static final RegistryObject<Block> WHITE_QUICKRUG = registerBlock("white_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.SNOW), quickrugSinkable));
+    public static final RegistryObject<Block> ORANGE_QUICKRUG = registerBlock("orange_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_ORANGE), quickrugSinkable));
+    public static final RegistryObject<Block> MAGENTA_QUICKRUG = registerBlock("magenta_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_MAGENTA), quickrugSinkable));
+    public static final RegistryObject<Block> LIGHT_BLUE_QUICKRUG = registerBlock("light_blue_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_LIGHT_BLUE), quickrugSinkable));
+    public static final RegistryObject<Block> YELLOW_QUICKRUG = registerBlock("yellow_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_YELLOW ), quickrugSinkable));
+    public static final RegistryObject<Block> LIME_QUICKRUG = registerBlock("lime_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_LIGHT_GREEN), quickrugSinkable));
+    public static final RegistryObject<Block> PINK_QUICKRUG = registerBlock("pink_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_PINK), quickrugSinkable));
+    public static final RegistryObject<Block> GRAY_QUICKRUG = registerBlock("gray_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_GRAY), quickrugSinkable));
+    public static final RegistryObject<Block> LIGHT_GRAY_QUICKRUG = registerBlock("light_gray_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_LIGHT_GRAY), quickrugSinkable));
+    public static final RegistryObject<Block> CYAN_QUICKRUG = registerBlock("cyan_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_CYAN), quickrugSinkable));
+    public static final RegistryObject<Block> PURPLE_QUICKRUG = registerBlock("purple_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_PURPLE), quickrugSinkable));
+    public static final RegistryObject<Block> BLUE_QUICKRUG = registerBlock("blue_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_BLUE), quickrugSinkable));
+    public static final RegistryObject<Block> BROWN_QUICKRUG = registerBlock("brown_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_BROWN), quickrugSinkable));
+    public static final RegistryObject<Block> GREEN_QUICKRUG = registerBlock("green_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_GREEN), quickrugSinkable));
+    public static final RegistryObject<Block> RED_QUICKRUG = registerBlock("red_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_RED), quickrugSinkable));
+    public static final RegistryObject<Block> BLACK_QUICKRUG = registerBlock("black_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_BLACK), quickrugSinkable));
 
 
 
@@ -148,7 +176,22 @@ public class ModBlocks {
 
         addItem(LIVING_SLIME);
 
-
+        addItem(WHITE_QUICKRUG);
+        addItem(ORANGE_QUICKRUG);
+        addItem(MAGENTA_QUICKRUG);
+        addItem(LIGHT_BLUE_QUICKRUG);
+        addItem(YELLOW_QUICKRUG);
+        addItem(LIME_QUICKRUG);
+        addItem(PINK_QUICKRUG);
+        addItem(GRAY_QUICKRUG);
+        addItem(LIGHT_GRAY_QUICKRUG);
+        addItem(CYAN_QUICKRUG);
+        addItem(PURPLE_QUICKRUG);
+        addItem(BLUE_QUICKRUG);
+        addItem(BROWN_QUICKRUG);
+        addItem(GREEN_QUICKRUG);
+        addItem(RED_QUICKRUG);
+        addItem(BLACK_QUICKRUG);
 
 
         addItem(MIXER);

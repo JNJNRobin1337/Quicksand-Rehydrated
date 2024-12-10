@@ -24,9 +24,17 @@ public class QuicksandBehavior {
     public DepthCurve sinkSpeed = new DepthCurve(.01d);
     public DepthCurve walkSpeed = new DepthCurve(.5, 0);
     public DepthCurve vertSpeed = new DepthCurve(.1d);
-    public DepthCurve wobbleTugHorizontal = new DepthCurve(0d);
+
+    public DepthCurve wobbleTugHorizontal = new DepthCurve(0d); // Wobble P (position)
     public DepthCurve wobbleTugVertical = new DepthCurve(0d);
-    public DepthCurve wobbleMove = new DepthCurve(1d);
+
+    public DepthCurve wobbleMove = new DepthCurve(1d); // used by both
+
+    // TODO separate by Horizontal and Vertical?
+    public DepthCurve wobbleRebound = new DepthCurve(0.1d); // Wobble M (momentum)
+    public DepthCurve wobbleDecay = new DepthCurve(0.9d); // inverse, 1 means it never decays
+    public DepthCurve wobbleApply = new DepthCurve(1.0d); // how much of the player's momentum is added to wobble momentum.
+
 
     public String coverageTexture = "quicksand_coverage";
     public String secretDeathMessage = "quicksand";
@@ -97,6 +105,40 @@ public class QuicksandBehavior {
     public QuicksandBehavior setWobbleMove(ArrayList<Vector2d> depth) {
         wobbleMove = new DepthCurve(depth); return this;}
     public double getWobbleMove(double depth) {return wobbleMove.getAt(depth);}
+
+
+
+    public QuicksandBehavior setWobbleDecay(DepthCurve curve) {
+        wobbleDecay = curve; return this;}
+    public QuicksandBehavior setWobbleDecay(double depth) {
+        wobbleDecay = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleDecay(double[] depth) {
+        wobbleDecay = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleDecay(ArrayList<Vector2d> depth) {
+        wobbleDecay = new DepthCurve(depth); return this;}
+    public double getWobbleDecay(double depth) {return wobbleDecay.getAt(depth);}
+
+    public QuicksandBehavior setWobbleRebound(DepthCurve curve) {
+        wobbleRebound = curve; return this;}
+    public QuicksandBehavior setWobbleRebound(double depth) {
+        wobbleRebound = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleRebound(double[] depth) {
+        wobbleRebound = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleRebound(ArrayList<Vector2d> depth) {
+        wobbleRebound = new DepthCurve(depth); return this;}
+    public double getWobbleRebound(double depth) {return wobbleRebound.getAt(depth);}
+
+    public QuicksandBehavior setWobbleApply(DepthCurve curve) {
+        wobbleApply = curve; return this;}
+    public QuicksandBehavior setWobbleApply(double depth) {
+        wobbleApply = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleApply(double[] depth) {
+        wobbleApply = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleApply(ArrayList<Vector2d> depth) {
+        wobbleApply = new DepthCurve(depth); return this;}
+    public double getWobbleApply(double depth) {return wobbleApply.getAt(depth);}
+
+
 
 
     public QuicksandBehavior setCoverageTexture(String coverageText) {this.coverageTexture = coverageText; return this;}

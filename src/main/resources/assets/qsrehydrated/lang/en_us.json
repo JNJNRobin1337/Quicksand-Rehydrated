@@ -23,7 +23,25 @@
   "block.qsrehydrated.swallowing_flesh": "Swallowing Flesh",
   "block.qsrehydrated.soft_gravel": "Soft Gravel",
   "block.qsrehydrated.silt_sludge": "Silt Sludge",
-  "block.qsrehydrated.quickrug": "Quickrug",
+
+  "block.qsrehydrated.white_quickrug": "White Quickrug",
+  "block.qsrehydrated.orange_quickrug": "Orange Quickrug",
+  "block.qsrehydrated.magenta_quickrug": "Magenta Quickrug",
+  "block.qsrehydrated.light_blue_quickrug": "Light Blue Quickrug",
+  "block.qsrehydrated.yellow_quickrug": "Yellow Quickrug",
+  "block.qsrehydrated.lime_quickrug": "Lime Quickrug",
+  "block.qsrehydrated.pink_quickrug": "Pink Quickrug",
+  "block.qsrehydrated.gray_quickrug": "Gray Quickrug",
+  "block.qsrehydrated.light_gray_quickrug": "Light Gray Quickrug",
+  "block.qsrehydrated.cyan_quickrug": "Cyan Quickrug",
+  "block.qsrehydrated.purple_quickrug": "Purple Quickrug",
+  "block.qsrehydrated.blue_quickrug": "Blue Quickrug",
+  "block.qsrehydrated.brown_quickrug": "Brown Quickrug",
+  "block.qsrehydrated.green_quickrug": "Green Quickrug",
+  "block.qsrehydrated.red_quickrug": "Red Quickrug",
+  "block.qsrehydrated.black_quickrug": "Black Quickrug",
+
+
 
   "block.qsrehydrated.bog": "Bog",
   "item.qsrehydrated.bog_bucket": "Bog Bucket",

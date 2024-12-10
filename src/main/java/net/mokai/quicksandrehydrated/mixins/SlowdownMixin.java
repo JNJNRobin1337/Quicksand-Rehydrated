@@ -139,30 +139,33 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
         Level eLevel = pEntity.level();
 
         if (stuckBlockValid(pEntity.blockPosition(), pEntity)) {return pEntity.blockPosition();}
-
-        // offset into middle of current block.
-
-        ePos = ePos.add(-0.5, 0, -0.5);
-        Vec3i vec3i = new Vec3i((int) ePos.x, (int) ePos.y, (int) ePos.z);
-        BlockPos blockPosOffset = new BlockPos(vec3i);
-
-        // there is bias towards the southwest block currently
-        // Should eventually change to a more sophisticated approach
-        // that accurately gets the closest quicksand block, instead.
-
-        BlockPos checkPos = blockPosOffset;
-        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
-
-        checkPos = blockPosOffset.north();
-        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
-
-        checkPos = blockPosOffset.west();
-        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
-
-        checkPos = blockPosOffset.north().west();
-        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
-
         return null;
+
+        // TODO quicksand collision is fucked up. Needs to be ... redone? Need to go about it in a smarter way.
+
+//        // offset into middle of current block.
+//
+//        ePos = ePos.add(-0.5, 0, -0.5);
+//        Vec3i vec3i = new Vec3i((int) ePos.x, (int) ePos.y, (int) ePos.z);
+//        BlockPos blockPosOffset = new BlockPos(vec3i);
+//
+//        // there is bias towards the southwest block currently
+//        // Should eventually change to a more sophisticated approach
+//        // that accurately gets the closest quicksand block, instead.
+//
+//        BlockPos checkPos = blockPosOffset;
+//        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+//
+//        checkPos = blockPosOffset.north();
+//        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+//
+//        checkPos = blockPosOffset.west();
+//        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+//
+//        checkPos = blockPosOffset.north().west();
+//        if (stuckBlockValid(checkPos, pEntity)) {return checkPos;}
+//
+//        return null;
 
     }
 

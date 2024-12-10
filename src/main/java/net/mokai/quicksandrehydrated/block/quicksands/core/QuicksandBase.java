@@ -10,13 +10,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.mokai.quicksandrehydrated.entity.EntityBubble;
 import net.mokai.quicksandrehydrated.entity.data.QuicksandEffect;
 import net.mokai.quicksandrehydrated.entity.data.QuicksandEffectManager;
-import net.mokai.quicksandrehydrated.entity.data.QuicksandWobbleEffect;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import net.mokai.quicksandrehydrated.entity.playerStruggling;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
@@ -50,6 +50,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
         super(pProperties);
         this.QSBehavior = QuicksandBehavior;
     }
+
 
 
     public String getCoverageTexture() {return QSBehavior.getCoverageTexture();}
@@ -88,27 +89,62 @@ public class QuicksandBase extends Block implements QuicksandInterface {
      */
     public double getVertSpeed(double depth) {return QSBehavior.getVertSpeed(depth);} //TODO: invert this back
 
-    /** How strongly the quicksand pulls the player horizontally towards the Tug point. 1 is full strength.
-     * @return Horizontal tug strength. [0, 1]
+    /** Used by position based wobble.
+     * How strongly the quicksand pulls the player horizontally towards the wobble point. 1 is full strength.
+     * @return Horizontal wobble strength. [0, 1]
      */
     public double getWobbleTugHorizontal(double depth) {return QSBehavior.getWobbleTugHorizontal(depth);}
 
-    /**
-     * How strongly the quicksand pulls the player vertically towards the Tug point. 1 is full strength.
-     * If not set, will default to equal the horizontal tug strength.
+    /** Used by position based wobble.
+     * How strongly the quicksand pulls the player vertically towards the wobble point. 1 is full strength.
+     * If not set, will default to equal the horizontal wobble strength.
      * @param depth
-     * @return Vertical tug strength. [0, 1]
+     * @return Vertical wobble strength. [0, 1]
      */
     public double getWobbleTugVertical(double depth) {return QSBehavior.getWobbleTugVertical(depth);}
 
-    /** How quickly the TugLerp point approaches the player, as a percentage of the distance per tick.
+    /** Used by both Wobble types.
+     * In position based wobble, How quickly the wobble point approaches the player, as a percentage of the distance per tick.
+     * In momentum based wobble, how much of the momentum is applied to the player, as a percentage of the total per tick.
      * You can think of this as how "sticky" the quicksand is.
      * 1.0 = no effect on player's movement
      * 0.0 = player effectively cannot move unless they manage to stop touching the QS.
      * @param depth
-     * @return Vertical tug strength. [0, 1]
+     * @return Vertical wobble strength. [0, 1]
      **/
     public double getWobbleMove(double depth) {return QSBehavior.getWobbleMove(depth);}
+
+    /** Used by momentum based wobble.
+     * How much the wobble momentum decays, percentage per tick.
+     * 1.0 = momentum never decays
+     * 0.0 = momentum completely decays every tick
+     * @param depth
+     * @return Vertical tug strength. [0, 1]
+     **/
+    public double getWobbleDecay(double depth) {return QSBehavior.getWobbleDecay(depth);}
+
+    /** Used by momentum based wobble.
+     * How much the wobble actually wobbles back and forth.
+     * Mathematically, how much of the actual wobble momentum is added to the wobble momentum's *momentum* as a percentage per tick.
+     * 1.0 = flips back and forth every single tick.
+     * 0.0 = wobble does not change. just drifts the player in some random direction.
+     * @param depth
+     * @return Vertical tug strength. [0, 1]
+     **/
+    public double getWobbleRebound(double depth) {return QSBehavior.getWobbleRebound(depth);}
+
+    /** Used by momentum based wobble.
+     * How much of the entity's momentum is added to the wobble momentum.
+     * You could think of it as how thick the quicksand is- separate from the Vert and Walk speeds.
+     * Mathematically, what percent of the entity's momentum is added to the wobble momentum per tick.
+     * 1.0 = 100% of the entity's momentum is added
+     * 0.0 = 0% added, no effect.
+     * @param depth
+     * @return Vertical tug strength. [0, 1]
+     **/
+    public double getWobbleApply(double depth) {return QSBehavior.getWobbleApply(depth);}
+
+
 
     /** The lowest point the TugPoint will sink to.
      * @return The buoyancy depth.
@@ -284,8 +320,12 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
         pEntity.addDeltaMovement(new Vec3(0.0, middlePoint, 0.0));
 
-        pEntity.level().playSound(pEntity, pEntity.blockPosition(), SoundEvents.SOUL_SOIL_STEP, SoundSource.BLOCKS, 0.25F, (pEntity.level().getRandom().nextFloat() * 0.1F) + 0.5F);
+        playStruggleSound(pEntity, struggleAmount);
 
+    }
+
+    public void playStruggleSound(Entity pEntity, double struggleAmount) {
+        pEntity.level().playSound(pEntity, pEntity.blockPosition(), SoundEvents.SOUL_SOIL_STEP, SoundSource.BLOCKS, 0.25F, (pEntity.level().getRandom().nextFloat() * 0.1F) + 0.5F);
     }
 
     public void tryApplyCoverage(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Entity pEntity) {
@@ -357,6 +397,13 @@ public class QuicksandBase extends Block implements QuicksandInterface {
         if (!pLevel.isClientSide()) {
             EntityBubble.spawn(pLevel, pos, Blocks.COAL_BLOCK.defaultBlockState());
         }
+    }
+
+
+
+    public boolean canBeReplaced(BlockState pState, Fluid pFluid) {
+        System.out.println("no replace!");
+        return false;
     }
 
     // This needs to be set for quicksand blocks that have Ambient Occlusion
