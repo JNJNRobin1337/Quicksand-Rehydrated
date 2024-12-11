@@ -21,6 +21,7 @@ import net.mokai.quicksandrehydrated.entity.data.QuicksandWobblePEffect;
 import net.mokai.quicksandrehydrated.util.DepthCurve;
 
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -101,6 +102,11 @@ public class ModBlocks {
 
 
     public static final RegistryObject<Block> SOFT_QUICKSAND = registerBlock("soft_quicksand", () -> new FlowingQuicksandBase(baseFlowingBehavior, new QuicksandBehavior()));
+
+
+    public static final RegistryObject<Block> MOSSY_PEAT_BOG = registerBlock("mossy_peat_bog", () -> new QuicksandBase(baseBehavior, new QuicksandBehavior()));
+    public static final RegistryObject<Block> PEAT_BOG = registerBlock("peat_bog", () -> new QuicksandBase(baseBehavior, new QuicksandBehavior()));
+
 
 
 
@@ -192,6 +198,9 @@ public class ModBlocks {
         addItem(GREEN_QUICKRUG);
         addItem(RED_QUICKRUG);
         addItem(BLACK_QUICKRUG);
+
+        addItem(MOSSY_PEAT_BOG);
+        addItem(PEAT_BOG);
 
 
         addItem(MIXER);

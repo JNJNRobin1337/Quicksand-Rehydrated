@@ -1,0 +1,13 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"particle": "qsrehydrated:block/peat_bog_side",
+
+		"down": "qsrehydrated:block/peat_bog_smooth",
+		"up": "qsrehydrated:block/mossy_peat_bog",
+		"east": "qsrehydrated:block/mossy_peat_bog_side",
+		"north": "qsrehydrated:block/mossy_peat_bog_side",
+		"south": "qsrehydrated:block/mossy_peat_bog_side",
+		"west": "qsrehydrated:block/mossy_peat_bog_side"
+	}
+}

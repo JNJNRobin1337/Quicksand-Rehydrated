@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "qsrehydrated:block/peat_bog"
+      },
+      {
+        "model": "qsrehydrated:block/peat_bog",
+        "y": 90
+      },
+      {
+        "model": "qsrehydrated:block/peat_bog",
+        "y": 180
+      },
+      {
+        "model": "qsrehydrated:block/peat_bog",
+        "y": 270
+      }
+    ]
+  }
+}
