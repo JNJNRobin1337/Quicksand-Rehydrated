@@ -3,8 +3,8 @@
 	"textures": {
 		"particle": "qsrehydrated:block/peat_bog_side",
 
-		"down": "qsrehydrated:block/peat_bog_smooth",
-		"up": "qsrehydrated:block/peat_bog_smooth",
+		"down": "qsrehydrated:block/peat_bog",
+		"up": "qsrehydrated:block/peat_bog",
 		"east": "qsrehydrated:block/peat_bog_side",
 		"north": "qsrehydrated:block/peat_bog_side",
 		"south": "qsrehydrated:block/peat_bog_side",

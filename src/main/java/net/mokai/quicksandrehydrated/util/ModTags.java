@@ -16,6 +16,16 @@ public class ModTags {
         public static final TagKey<Block> QUICKSAND_AO_OVERRIDE
                 = tag("quicksand_ao_override");
 
+        public static final TagKey<Block> DUCKWEED
+                = tag("duckweed");
+
+        public static final TagKey<Block> FERN_BUSH
+                = tag("fern_bush");
+
+        public static final TagKey<Block> PEAT_BOG_BUSH
+                = tag("peat_bog_bush");
+
+
         private static TagKey<Block> tag(String name) {
             return BlockTags.create(new ResourceLocation(QuicksandRehydrated.MOD_ID, name));
         }
