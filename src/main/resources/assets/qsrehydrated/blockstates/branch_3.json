@@ -1,0 +1,21 @@
+{
+"variants": {
+"": [
+{
+"model": "qsrehydrated:block/branch_3"
+},
+{
+"model": "qsrehydrated:block/branch_3",
+"y": 90
+},
+{
+"model": "qsrehydrated:block/branch_3",
+"y": 180
+},
+{
+"model": "qsrehydrated:block/branch_3",
+"y": 270
+}
+]
+}
+}

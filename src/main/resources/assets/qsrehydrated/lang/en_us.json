@@ -8,9 +8,8 @@
   "block.qsrehydrated.soft_quicksand":  "Soft quicksand",
   "block.qsrehydrated.moor": "Moor",
   "block.qsrehydrated.mire": "Mire",
-  "block.qsrehydrated.mossy_peat_bog": "Mossy Peat Bog",
-  "block.qsrehydrated.peat_bog": "Peat Bog",
-  "block.qsrehydrated.wet_peat": "Wet Peat",
+  "block.qsrehydrated.mossy_peat_bog": "Mossy Peat",
+  "block.qsrehydrated.peat_bog": "Peat",
   "block.qsrehydrated.dry_peat": "Dried Peat",
   "block.qsrehydrated.brown_clay": "Brown Clay",
   "block.qsrehydrated.mineral_clay": "Mineral Clay",
@@ -43,7 +42,14 @@
   "block.qsrehydrated.red_quickrug": "Red Quickrug",
   "block.qsrehydrated.black_quickrug": "Black Quickrug",
 
-
+  "block.qsrehydrated.duckweed": "Duckweed",
+  "block.qsrehydrated.duckweed_flowers": "Duckweed Flowers",
+  "block.qsrehydrated.peat_bog_bush": "Moor Grass",
+  "block.qsrehydrated.fern_bush": "Fern Bush",
+  "block.qsrehydrated.branch_1": "Muddy Branch",
+  "block.qsrehydrated.branch_2": "Muddy Branch",
+  "block.qsrehydrated.branch_3": "Muddy Branch",
+  "block.qsrehydrated.branch_4": "Muddy Branch",
 
   "block.qsrehydrated.bog": "Bog",
   "item.qsrehydrated.bog_bucket": "Bog Bucket",

@@ -8,13 +8,17 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBehavior;
 import net.mokai.quicksandrehydrated.entity.EntityBubble;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import net.mokai.quicksandrehydrated.util.BodyDepthThreshold;
+import net.mokai.quicksandrehydrated.util.DepthCurve;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -28,6 +32,7 @@ public class DeepMudBlock extends QuicksandBase {
     public String coverageTexture() {
         return "qsrehydrated:textures/entity/coverage/mud_coverage.png";
     }
+
 
     public double maxDepth;
     public DeepMudBlock(Properties pProperties, QuicksandBehavior QSB, double mudDepth) {
@@ -63,9 +68,6 @@ public class DeepMudBlock extends QuicksandBase {
         return EasingHandler.doubleListInterpolate(normalDepth, new double[]{a, b}); // player not allowed to move
 
     }
-
-
-
 
 
     @Override

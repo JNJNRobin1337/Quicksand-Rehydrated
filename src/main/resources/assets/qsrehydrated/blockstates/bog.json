@@ -1,0 +1,21 @@
+{
+"variants": {
+"": [
+{
+"model": "qsrehydrated:block/bog"
+},
+{
+"model": "qsrehydrated:block/bog",
+"y": 90
+},
+{
+"model": "qsrehydrated:block/bog",
+"y": 180
+},
+{
+"model": "qsrehydrated:block/bog",
+"y": 270
+}
+]
+}
+}
