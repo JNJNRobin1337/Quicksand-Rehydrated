@@ -6,12 +6,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.mokai.quicksandrehydrated.block.*;
+import net.mokai.quicksandrehydrated.block.Plants.*;
 import net.mokai.quicksandrehydrated.block.quicksands.*;
 import net.mokai.quicksandrehydrated.block.quicksands.core.FlowingQuicksandBase;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
@@ -44,17 +46,23 @@ public class ModBlocks {
     //TODO: When making new substances, make sure to include them in resources/data/qsrehydrated/tags/blocks/quicksand_drownable.json
 
     private final static BlockBehaviour.Properties baseBehavior = BlockBehaviour.Properties.copy(Blocks.SAND).noCollission().requiresCorrectToolForDrops()
-            .noOcclusion().isViewBlocking((A, B, C) -> true);
+            .noOcclusion().isViewBlocking((A, B, C) -> true).forceSolidOn();
+
+    private final static BlockBehaviour.Properties muddyBehavior = BlockBehaviour.Properties.copy(Blocks.MUD).noCollission().requiresCorrectToolForDrops()
+            .noOcclusion().isViewBlocking((A, B, C) -> true).forceSolidOn();
+
 
     // canOcclude
 
     private final static BlockBehaviour.Properties baseFlowingBehavior = BlockBehaviour.Properties.copy(Blocks.SAND).noCollission().requiresCorrectToolForDrops()
-            .noOcclusion().isViewBlocking((A, B, C) -> A.getValue(FlowingQuicksandBase.LEVEL) >= 4);
+            .noOcclusion().isViewBlocking((A, B, C) -> A.getValue(FlowingQuicksandBase.LEVEL) >= 4).forceSolidOn();
     private final static BlockBehaviour.Properties slimeBehavior = BlockBehaviour.Properties.copy(Blocks.SLIME_BLOCK).noCollission()
-            .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F);
+            .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F).forceSolidOn();
 
     private final static BlockBehaviour.Properties woolBehavior = BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).noCollission()
             .noOcclusion().isViewBlocking((A, B, C) -> true).friction(1.0F).strength(2.5F).forceSolidOn();
+
+
 
 
     public static final RegistryObject<Block> QUICKSAND = registerBlock("quicksand", () -> new Quicksand( baseBehavior.randomTicks(), new QuicksandBehavior()
@@ -95,18 +103,37 @@ public class ModBlocks {
             .setWalkSpeed(new DepthCurve(new double[]{0.9, 0.55, 0.15, 0.1, 0.0}))
             .setSinkSpeed(0);
 
-    public static final RegistryObject<Block> THIN_MUD = registerBlock("thin_mud", () -> new DeepMudBlock( baseBehavior.sound(SoundType.MUD), mudSinkable, 0.2d));
-    public static final RegistryObject<Block> SHALLOW_MUD = registerBlock("shallow_mud", () -> new DeepMudBlock( baseBehavior.sound(SoundType.MUD), mudSinkable, 0.5d));
-    public static final RegistryObject<Block> DEEP_MUD = registerBlock("deep_mud", () -> new DeepMudBlock( baseBehavior.sound(SoundType.MUD), mudSinkable, 1.0d));
-    public static final RegistryObject<Block> BOTTOMLESS_MUD = registerBlock("bottomless_mud", () -> new DeepMudBlock( baseBehavior.sound(SoundType.MUD), mudSinkable, 2.5d));
+    public static final RegistryObject<Block> THIN_MUD = registerBlock("thin_mud", () -> new DeepMudBlock( muddyBehavior.sound(SoundType.MUD), mudSinkable, 0.2d));
+    public static final RegistryObject<Block> SHALLOW_MUD = registerBlock("shallow_mud", () -> new DeepMudBlock( muddyBehavior.sound(SoundType.MUD), mudSinkable, 0.5d));
+    public static final RegistryObject<Block> DEEP_MUD = registerBlock("deep_mud", () -> new DeepMudBlock( muddyBehavior.sound(SoundType.MUD), mudSinkable, 1.0d));
+    public static final RegistryObject<Block> BOTTOMLESS_MUD = registerBlock("bottomless_mud", () -> new DeepMudBlock( muddyBehavior.sound(SoundType.MUD), mudSinkable, 2.5d));
 
 
     public static final RegistryObject<Block> SOFT_QUICKSAND = registerBlock("soft_quicksand", () -> new FlowingQuicksandBase(baseFlowingBehavior, new QuicksandBehavior()));
 
 
-    public static final RegistryObject<Block> MOSSY_PEAT_BOG = registerBlock("mossy_peat_bog", () -> new QuicksandBase(baseBehavior, new QuicksandBehavior()));
-    public static final RegistryObject<Block> PEAT_BOG = registerBlock("peat_bog", () -> new QuicksandBase(baseBehavior, new QuicksandBehavior()));
+    public static final RegistryObject<Block> MOSSY_PEAT_BOG = registerBlock("mossy_peat_bog", () -> new MossyPeatBog(muddyBehavior, new QuicksandBehavior()
+            .setSinkSpeed(new DepthCurve(new double[]{0.008, 0, -0.003, -0.003}))
+            .setVertSpeed(.1)
+            .setWalkSpeed(.4)
 
+            .setWobbleMove(.6)
+            .setWobbleTugHorizontal(.4)
+            .setWobbleTugVertical(0)
+    ));
+
+    public static final RegistryObject<Block> PEAT_BOG = registerBlock("peat_bog", () -> new MossyPeatBog(muddyBehavior, new QuicksandBehavior()
+            .setSinkSpeed(new DepthCurve(new double[]{0.008, 0.006, 0.0045, 0.0030, 0.0015, 0.003, 0.001}))
+            .setVertSpeed(.08)
+            .setWalkSpeed(.4)
+
+            .setWobbleMove(.6)
+            .setWobbleTugHorizontal(.4)
+
+            .setBubbleChance(.9)
+    ));
+
+    public static final RegistryObject<Block> BOG = registerBlock("bog", () -> new QuicksandBase(muddyBehavior, new QuicksandBehavior()));
 
 
 
@@ -161,11 +188,28 @@ public class ModBlocks {
     public static final RegistryObject<Block> BLACK_QUICKRUG = registerBlock("black_quickrug", () -> new Quickrug( woolBehavior.mapColor(MapColor.COLOR_BLACK), quickrugSinkable));
 
 
+    //Plant and stuff
+
+
+    public static final RegistryObject<Block> DUCKWEED = registerBlock("duckweed", () -> new Duckweed(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().replaceable().sound(SoundType.GRASS).instabreak()));
+    public static final RegistryObject<Block> DUCKWEED_FLOWERS = registerBlock("duckweed_flowers", () -> new Duckweed(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().replaceable().sound(SoundType.GRASS).instabreak()));
+    public static final RegistryObject<Block> PEAT_BOG_BUSH = registerBlock("peat_bog_bush", () -> new PeatBogBush(BlockBehaviour.Properties.copy(Blocks.GRASS)));
+    public static final RegistryObject<Block> FERN_BUSH = registerBlock("fern_bush", () -> new FernBush(BlockBehaviour.Properties.copy(Blocks.GRASS)));
+    public static final RegistryObject<Block> CATTAIL_REEDS = registerBlock("cattail_reeds", () -> new CattailReeds(BlockBehaviour.Properties.copy(Blocks.GRASS)));
+    public static final RegistryObject<Block> BRANCH_1 = registerBlock("branch_1", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
+    public static final RegistryObject<Block> BRANCH_2 = registerBlock("branch_2", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
+    public static final RegistryObject<Block> BRANCH_3 = registerBlock("branch_3", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
+    public static final RegistryObject<Block> BRANCH_4 = registerBlock("branch_4", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
+
+
 
     // ----------------------------------- Done! -----------------------------
 
 
     private static Collection<ItemStack> CREATIVELIST;
+
+    public ModBlocks(BlockBehaviour.Properties properties) {
+    }
 
     public static void addItem(RegistryObject<Block> b) {CREATIVELIST.add(b.get().asItem().getDefaultInstance());}
 
@@ -201,9 +245,21 @@ public class ModBlocks {
 
         addItem(MOSSY_PEAT_BOG);
         addItem(PEAT_BOG);
-
+        addItem(BOG);
 
         addItem(MIXER);
+
+        //Plant, crops and flowers//
+
+        addItem(PEAT_BOG_BUSH);
+        addItem(DUCKWEED);
+        addItem(DUCKWEED_FLOWERS);
+        addItem(FERN_BUSH);
+        addItem(BRANCH_1);
+        addItem(BRANCH_2);
+        addItem(BRANCH_3);
+        addItem(BRANCH_4);
+
         return CREATIVELIST;
     }
 
