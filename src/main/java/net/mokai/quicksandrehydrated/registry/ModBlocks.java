@@ -196,10 +196,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> PEAT_BOG_BUSH = registerBlock("peat_bog_bush", () -> new PeatBogBush(BlockBehaviour.Properties.copy(Blocks.GRASS)));
     public static final RegistryObject<Block> FERN_BUSH = registerBlock("fern_bush", () -> new FernBush(BlockBehaviour.Properties.copy(Blocks.GRASS)));
     public static final RegistryObject<Block> CATTAIL_REEDS = registerBlock("cattail_reeds", () -> new CattailReeds(BlockBehaviour.Properties.copy(Blocks.GRASS)));
-    public static final RegistryObject<Block> BRANCH_1 = registerBlock("branch_1", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
-    public static final RegistryObject<Block> BRANCH_2 = registerBlock("branch_2", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
-    public static final RegistryObject<Block> BRANCH_3 = registerBlock("branch_3", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
-    public static final RegistryObject<Block> BRANCH_4 = registerBlock("branch_4", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).noCollission().noOcclusion().instabreak()));
+    public static final RegistryObject<Block> BRANCH = registerBlock("muddy_branch", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noCollission().noOcclusion().instabreak()));
 
 
 
@@ -255,10 +252,7 @@ public class ModBlocks {
         addItem(DUCKWEED);
         addItem(DUCKWEED_FLOWERS);
         addItem(FERN_BUSH);
-        addItem(BRANCH_1);
-        addItem(BRANCH_2);
-        addItem(BRANCH_3);
-        addItem(BRANCH_4);
+        addItem(BRANCH);
 
         return CREATIVELIST;
     }
