@@ -1,0 +1,76 @@
+{
+  "variants": {
+    "facing=north,shape=0": {
+      "model": "qsrehydrated:block/branch_4"
+    },
+    "facing=south,shape=0": {
+      "model": "qsrehydrated:block/branch_4",
+      "y": 180
+    },
+    "facing=west,shape=0": {
+      "model": "qsrehydrated:block/branch_4",
+      "y": 270
+    },
+    "facing=east,shape=0": {
+      "model": "qsrehydrated:block/branch_4",
+      "y": 90
+    },
+    "facing=north,shape=1": {
+      "model": "qsrehydrated:block/branch_1"
+    },
+    "facing=south,shape=1": {
+      "model": "qsrehydrated:block/branch_1",
+      "y": 180
+    },
+    "facing=west,shape=1": {
+      "model": "qsrehydrated:block/branch_1",
+      "y": 270
+    },
+    "facing=east,shape=1": {
+      "model": "qsrehydrated:block/branch_1",
+      "y": 90
+    },
+    "facing=north,shape=2": {
+      "model": "qsrehydrated:block/branch_2"
+    },
+    "facing=south,shape=2": {
+      "model": "qsrehydrated:block/branch_2",
+      "y": 180
+    },
+    "facing=west,shape=2": {
+      "model": "qsrehydrated:block/branch_2",
+      "y": 270
+    },
+    "facing=east,shape=2": {
+      "model": "qsrehydrated:block/branch_2",
+      "y": 90
+    },
+    "facing=north,shape=3": {
+      "model": "qsrehydrated:block/branch_3"
+    },
+    "facing=south,shape=3": {
+      "model": "qsrehydrated:block/branch_3",
+      "y": 180
+    },
+    "facing=west,shape=3": {
+      "model": "qsrehydrated:block/branch_3",
+      "y": 270
+    },
+    "facing=east,shape=3": {
+      "model": "qsrehydrated:block/branch_3",
+      "y": 90
+    },
+    "facing=north,shape=4": {
+      "model": "minecraft:block/air"
+    },
+    "facing=south,shape=4": {
+      "model": "minecraft:block/air"
+    },
+    "facing=west,shape=4": {
+      "model": "minecraft:block/air"
+    },
+    "facing=east,shape=4": {
+      "model": "minecraft:block/air"
+    }
+  }
+}
