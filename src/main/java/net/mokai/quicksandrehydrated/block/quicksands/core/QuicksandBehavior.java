@@ -143,6 +143,7 @@ public class QuicksandBehavior {
 
     public QuicksandBehavior setCoverageTexture(String coverageText) {this.coverageTexture = coverageText; return this;}
     public String            getCoverageTexture() {return "qsrehydrated:textures/entity/coverage/" + coverageTexture + ".png";}
+    public String            getCoverageTex() {return coverageTexture;}
 
     public QuicksandBehavior setSecretDeathMessage(String deathmessage) {secretDeathMessage = deathmessage; return this;}
     public String            getSecretDeathMessage(){ return secretDeathMessage;}
