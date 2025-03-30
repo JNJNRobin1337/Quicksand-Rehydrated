@@ -16,8 +16,6 @@ public class QuicksandBehavior {
      */
 
 
-
-
     public List<Class<? extends QuicksandEffect>> effectsList = new ArrayList<Class<? extends QuicksandEffect>>();
 
     public DepthCurve bubbleChance = new DepthCurve(1d);
@@ -42,7 +40,6 @@ public class QuicksandBehavior {
     public double buoyancyPoint = 2d;
     public double offset = 0;
     public double stepOutHeight = .1d;
-
 
 
     public QuicksandBehavior addQuicksandEffect(Class<? extends QuicksandEffect> effectClass) {
@@ -76,66 +73,42 @@ public class QuicksandBehavior {
     public QuicksandBehavior setVertSpeed(ArrayList<Vector2d> speed) {vertSpeed = new DepthCurve(speed); return this;}
     public double            getVertSpeed(double depth) {return vertSpeed.getAt(depth);}
 
-    public QuicksandBehavior setWobbleTugHorizontal(DepthCurve curve) {
-        wobbleTugHorizontal = curve; return this;}
-    public QuicksandBehavior setWobbleTugHorizontal(double tug) {
-        wobbleTugHorizontal = new DepthCurve(tug); return this;}
-    public QuicksandBehavior setWobbleTugHorizontal(double[] tug) {
-        wobbleTugHorizontal = new DepthCurve(tug); return this;}
-    public QuicksandBehavior setWobbleTugHorizontal(ArrayList<Vector2d> tug) {
-        wobbleTugHorizontal = new DepthCurve(tug); return this;}
+    public QuicksandBehavior setWobbleTugHorizontal(DepthCurve curve) {wobbleTugHorizontal = curve; return this;}
+    public QuicksandBehavior setWobbleTugHorizontal(double tug) {wobbleTugHorizontal = new DepthCurve(tug); return this;}
+    public QuicksandBehavior setWobbleTugHorizontal(double[] tug) {wobbleTugHorizontal = new DepthCurve(tug); return this;}
+    public QuicksandBehavior setWobbleTugHorizontal(ArrayList<Vector2d> tug) {wobbleTugHorizontal = new DepthCurve(tug); return this;}
     public double getWobbleTugHorizontal(double depth) {return wobbleTugHorizontal.getAt(depth);}
 
-    public QuicksandBehavior setWobbleTugVertical(DepthCurve curve) {
-        wobbleTugVertical = curve; return this;}
-    public QuicksandBehavior setWobbleTugVertical(double tug) {
-        wobbleTugVertical = new DepthCurve(tug); return this;}
-    public QuicksandBehavior setWobbleTugVertical(double[] tug) {
-        wobbleTugVertical = new DepthCurve(tug); return this;}
-    public QuicksandBehavior setWobbleTugVertical(ArrayList<Vector2d> tug) {
-        wobbleTugVertical = new DepthCurve(tug); return this;}
+    public QuicksandBehavior setWobbleTugVertical(DepthCurve curve) {wobbleTugVertical = curve; return this;}
+    public QuicksandBehavior setWobbleTugVertical(double tug) {wobbleTugVertical = new DepthCurve(tug); return this;}
+    public QuicksandBehavior setWobbleTugVertical(double[] tug) {wobbleTugVertical = new DepthCurve(tug); return this;}
+    public QuicksandBehavior setWobbleTugVertical(ArrayList<Vector2d> tug) {wobbleTugVertical = new DepthCurve(tug); return this;}
     public double getWobbleTugVertical(double depth) {return wobbleTugVertical.getAt(depth);}
 
-    public QuicksandBehavior setWobbleMove(DepthCurve curve) {
-        wobbleMove = curve; return this;}
-    public QuicksandBehavior setWobbleMove(double depth) {
-        wobbleMove = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleMove(double[] depth) {
-        wobbleMove = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleMove(ArrayList<Vector2d> depth) {
-        wobbleMove = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleMove(DepthCurve curve) {wobbleMove = curve; return this;}
+    public QuicksandBehavior setWobbleMove(double depth) {wobbleMove = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleMove(double[] depth) {wobbleMove = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleMove(ArrayList<Vector2d> depth) {wobbleMove = new DepthCurve(depth); return this;}
     public double getWobbleMove(double depth) {return wobbleMove.getAt(depth);}
 
 
 
-    public QuicksandBehavior setWobbleDecay(DepthCurve curve) {
-        wobbleDecay = curve; return this;}
-    public QuicksandBehavior setWobbleDecay(double depth) {
-        wobbleDecay = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleDecay(double[] depth) {
-        wobbleDecay = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleDecay(ArrayList<Vector2d> depth) {
-        wobbleDecay = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleDecay(DepthCurve curve) {wobbleDecay = curve; return this;}
+    public QuicksandBehavior setWobbleDecay(double depth) {wobbleDecay = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleDecay(double[] depth) {wobbleDecay = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleDecay(ArrayList<Vector2d> depth) {wobbleDecay = new DepthCurve(depth); return this;}
     public double getWobbleDecay(double depth) {return wobbleDecay.getAt(depth);}
 
-    public QuicksandBehavior setWobbleRebound(DepthCurve curve) {
-        wobbleRebound = curve; return this;}
-    public QuicksandBehavior setWobbleRebound(double depth) {
-        wobbleRebound = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleRebound(double[] depth) {
-        wobbleRebound = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleRebound(ArrayList<Vector2d> depth) {
-        wobbleRebound = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleRebound(DepthCurve curve) {wobbleRebound = curve; return this;}
+    public QuicksandBehavior setWobbleRebound(double depth) {wobbleRebound = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleRebound(double[] depth) {wobbleRebound = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleRebound(ArrayList<Vector2d> depth) {wobbleRebound = new DepthCurve(depth); return this;}
     public double getWobbleRebound(double depth) {return wobbleRebound.getAt(depth);}
 
-    public QuicksandBehavior setWobbleApply(DepthCurve curve) {
-        wobbleApply = curve; return this;}
-    public QuicksandBehavior setWobbleApply(double depth) {
-        wobbleApply = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleApply(double[] depth) {
-        wobbleApply = new DepthCurve(depth); return this;}
-    public QuicksandBehavior setWobbleApply(ArrayList<Vector2d> depth) {
-        wobbleApply = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleApply(DepthCurve curve) {wobbleApply = curve; return this;}
+    public QuicksandBehavior setWobbleApply(double depth) {wobbleApply = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleApply(double[] depth) {wobbleApply = new DepthCurve(depth); return this;}
+    public QuicksandBehavior setWobbleApply(ArrayList<Vector2d> depth) {wobbleApply = new DepthCurve(depth); return this;}
     public double getWobbleApply(double depth) {return wobbleApply.getAt(depth);}
 
 

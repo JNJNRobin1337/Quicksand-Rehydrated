@@ -25,6 +25,40 @@ import java.util.UUID;
 
 public class EntityTarGolem extends AbstractGolem implements NeutralMob {
 
+    /**
+     * TODO: We want to implement more complex behavior, probably through a TarGolemBrain class akin to Piglins.
+     *
+     * ALL STATES:
+     *   - Has natural regeneration.
+     *   - Physical attacks by and against the Golem grant a short Tarred status, reducing movement and swing speed, regardless of alignment.
+     *
+     * ATTACKS:
+     *   - Slam: default attack, always starts with this.
+     *       - use the full attack animation. The initial hit has negative knockback and pulls the player in closer,
+     *         and then a following Slam attack (part of the same animation) attaches a Tar lead to the player.
+     *   - Tar Drag: If it has a target leaded and it has a home base, uses this.
+     *       - Drags the leaded target backwards towards its home base, moving past until it drags the target into the tar pit.
+     *   - Absorb: If a target is leaded and it does NOT have a home base, use this.
+     *       - Functions identical to slimes; attaches to the head and slowly sinks in.
+     *
+     * HOSTILE: Attacks on sight, and has a home block in a tar pit.
+     *   - Touching the Tar Golem at any point will attach a Tar lead.
+     *   - Once leaded, the Tar Golem has a 75-25% chance to use Tar Drag or absorb, rerolling this chance any time it takes a Melee attack.
+     *   - If its home is covered or destroyed, always use Absorb.
+     *
+     * FRIENDLY:
+     *   - The Tar Golem is friendly towards its creator, and passive towards other players and mobs. It will attack in retaliation,
+     *     and attack anyone its controller hits, a la wolves.
+     *   - Does not do pit-dragging behavior.
+     *   - Can be mounted by creator by touching above floor height.
+     *
+     * MOUNTED:
+     *   - Directly controlled like horses.
+     *   - Climbs up 1-block steps like iron golems.
+     *   - Jump has it use the Absorb attack on you; Shift automatically escapes and returns you to normal Mounted state.
+     */
+
+
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(EntityTarGolem.class, EntityDataSerializers.BOOLEAN);
 
     public AnimationState idleAnimationState = new AnimationState();
@@ -32,13 +66,14 @@ public class EntityTarGolem extends AbstractGolem implements NeutralMob {
     public AnimationState attackingAnimationState = new AnimationState();
     public int attackAnimationTimeout = 0;
 
-
     public EntityTarGolem(EntityType<? extends AbstractGolem> pEntityType, Level pLevel) {super(pEntityType, pLevel);}
 
     public static AttributeSupplier setAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 2)
                 .add(Attributes.MOVEMENT_SPEED, .25)
+                .add(Attributes.ATTACK_KNOCKBACK, 0.5f)
+                .add(Attributes.ATTACK_DAMAGE, 2f)
                 .build();
     }
 
