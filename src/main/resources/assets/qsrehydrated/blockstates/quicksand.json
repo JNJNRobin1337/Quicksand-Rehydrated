@@ -1,6 +1,16 @@
 {
   "variants": {
-    "state=1": { "model": "qsrehydrated:block/quicksand"},
-    "state=2": { "model": "qsrehydrated:block/quicksand_disturbed"}
+    "liquefaction=0": [
+    	{ "model": "qsrehydrated:block/quicksand_0a"},
+    	{ "model": "qsrehydrated:block/quicksand_0b"},
+    	{ "model": "qsrehydrated:block/quicksand_0c"}
+    ],
+    "liquefaction=1": { "model": "qsrehydrated:block/quicksand_1" },
+    "liquefaction=2": { "model": "qsrehydrated:block/quicksand_2" },
+    "liquefaction=3": { "model": "qsrehydrated:block/quicksand_3" },
+    "liquefaction=4": { "model": "qsrehydrated:block/quicksand_4" },
+    "liquefaction=5": { "model": "qsrehydrated:block/quicksand_5" },
+    "liquefaction=6": { "model": "qsrehydrated:block/quicksand_6" },
+    "liquefaction=7": { "model": "qsrehydrated:block/quicksand_7" }
   }
 }
