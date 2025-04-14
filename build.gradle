@@ -58,6 +58,7 @@ minecraft {
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
+
     runs {
         // applies to all the run configs below
         configureEach {

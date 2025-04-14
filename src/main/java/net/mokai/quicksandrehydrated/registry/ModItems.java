@@ -33,8 +33,8 @@ public class ModItems {
     public static final RegistryObject<Item> QUICKSAND_POTION = ITEMS.register("potion_of_sinking", () -> new QuicksandPotion(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> QUICKSAND_SPLASH_POTION = ITEMS.register("splash_potion_of_sinking", () -> new QuicksandPotionThrowable(new Item.Properties().stacksTo(16)));
 
-    public static final RegistryObject<SpawnEggItem> HUNNIBEE_SPAWN_EGG = ITEMS.register("hunnibee_spawn_egg", () -> new ForgeSpawnEggItem(ModEntityTypes.HUNNIBEE, 0x010101, 0xFFFF00, new Item.Properties()));
-
+    public static final RegistryObject<SpawnEggItem> HUNNIBEE_SPAWN_EGG = ITEMS.register("hunnibee_spawn_egg", () -> new ForgeSpawnEggItem(ModEntityTypes.HUNNIBEE, 0x1B1B1B, 0xFFFF00, new Item.Properties()));
+    public static final RegistryObject<SpawnEggItem> TAR_GOLEM_SPAWN_EGG = ITEMS.register("tar_golem_spawn_egg", () -> new ForgeSpawnEggItem(ModEntityTypes.TAR_GOLEM, 0x1B1B1B, 0xD1BC92, new Item.Properties()));
 
 
     public static final DeferredRegister<Potion> POTIONS = DeferredRegister.create(ForgeRegistries.POTIONS, QuicksandRehydrated.MOD_ID);
@@ -64,12 +64,16 @@ public class ModItems {
         addItem(QUICKSAND_BOOK);
         addItem(QUICKSAND_POTION);
         addItem(QUICKSAND_SPLASH_POTION);
-        REGLIST.add(HUNNIBEE_SPAWN_EGG.get().getDefaultInstance());
-
+        addEggItem(HUNNIBEE_SPAWN_EGG);
+        addEggItem(TAR_GOLEM_SPAWN_EGG);
         return REGLIST;
     }
 
     public static void addItem(RegistryObject<Item> b) {
+        REGLIST.add(b.get().getDefaultInstance());
+    }
+
+    public static void addEggItem(RegistryObject<SpawnEggItem> b) {
         REGLIST.add(b.get().getDefaultInstance());
     }
 

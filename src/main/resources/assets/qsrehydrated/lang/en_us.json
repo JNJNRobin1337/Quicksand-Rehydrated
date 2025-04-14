@@ -95,6 +95,9 @@
   "item.qsrehydrated.music_disc_flight": "Music Disc",
   "item.qsrehydrated.music_disc_flight.desc": "Rimsky-Korsakov - Flight of the Bumblebee",
   "item.qsrehydrated.hunnibee_spawn_egg": "Hunnibee Spawn Egg",
+  "item.qsrehydrated.cave_blob_spawn_egg": "Cave Blob Spawn Egg",
+  "item.qsrehydrated.tar_golem_spawn_egg": "Tar Golem Spawn Egg",
+  "item.qsrehydrated.bog_golem_spawn_egg": "Bog Golem Spawn Egg",
 
   "item.qsrehydrated.potion_of_sinking.effect.water": "Potion of Sinking",
   "item.qsrehydrated.splash_potion_of_sinking.effect.water": "Splash Potion of Sinking",
