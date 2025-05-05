@@ -64,25 +64,12 @@ public class ModBlocks {
 
 
 
-
     public static final RegistryObject<Block> QUICKSAND = registerBlock("quicksand", () -> new Quicksand( baseBehavior.randomTicks(), new QuicksandBehavior()
             .setCoverageTexture("quicksand_coverage")
             .setSinkSpeed(.0005d)
             .setVertSpeed(.1d)
             .setWalkSpeed(new DepthCurve(0.9, 0.1))
     ));
-
-
-
-
-
-//    public static final RegistryObject<Block> LIVING_SLIME = registerBlock("living_slime", () -> new LivingSlime( slimeBehavior, new QuicksandBehavior()
-//            .setWobbleMove(0.025d)
-//            .setWobbleTugHorizontal(new DepthCurve(0.08d, 0.06d))
-//            .setVertSpeed(.4d)
-//            .setSinkSpeed(new DepthCurve(new double[]{.001d, .000d, -.001d, .000d, .001d, .003d, .006d, .009d}))
-//            .setWalkSpeed(new DepthCurve(1, .2))
-//    ));
 
         public static final RegistryObject<Block> LIVING_SLIME = registerBlock("living_slime", () -> new QuicksandBase( slimeBehavior, new QuicksandBehavior()
             .setSinkSpeed(0.001d)
@@ -95,10 +82,6 @@ public class ModBlocks {
             .addQuicksandEffect(QuicksandWobblePEffect.class)
             .setCoverageTexture("slime_coverage")
     ));
-
-
-
-
 
     static QuicksandBehavior mudSinkable = new QuicksandBehavior()
             .setVertSpeed(0.4)
@@ -114,7 +97,6 @@ public class ModBlocks {
 
 
     public static final RegistryObject<Block> SOFT_QUICKSAND = registerBlock("soft_quicksand", () -> new FlowingQuicksandBase(baseFlowingBehavior, new QuicksandBehavior()));
-
 
     public static final RegistryObject<Block> MOSSY_PEAT_BOG = registerBlock("mossy_peat_bog", () -> new MossyPeatBog(muddyBehavior, new QuicksandBehavior()
             .setSinkSpeed(new DepthCurve(new double[]{0.008, 0, -0.003, -0.003}))

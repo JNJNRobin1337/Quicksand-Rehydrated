@@ -16,6 +16,7 @@ import net.mokai.quicksandrehydrated.client.render.coverage.CoverageAtlasHolder;
 import net.mokai.quicksandrehydrated.client.render.coverage.CoverageLayer;
 import net.mokai.quicksandrehydrated.client.render.coverage.PlayerCoverageDefaultModel;
 import net.mokai.quicksandrehydrated.client.render.coverage.PlayerCoverageSlimModel;
+import net.mokai.quicksandrehydrated.entity.playerStruggling;
 import net.mokai.quicksandrehydrated.registry.ModModelLayers;
 import net.mokai.quicksandrehydrated.util.Keybinding;
 
@@ -28,7 +29,7 @@ public class ClientEvents {
         public static void onKeyInput(InputEvent.Key event) {
             if (Keybinding.STRUGGLE_KEY.consumeClick()) {
                 // cast to playerStruggling interface
-                // ((playerStruggling) Minecraft.getInstance().player).attemptStruggle();
+                ((playerStruggling) Minecraft.getInstance().player).attemptStruggle();
             }
         }
 
@@ -57,7 +58,6 @@ public class ClientEvents {
             renderer = (PlayerRenderer)e.getSkin("slim");
             renderer.addLayer(new CoverageLayer(renderer, true));
         }
-
 
         @SubscribeEvent
         public static void shaderRegistry(RegisterShadersEvent event) throws IOException

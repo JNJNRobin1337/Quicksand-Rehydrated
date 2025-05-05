@@ -338,7 +338,7 @@ public abstract class SlowdownMixin implements entityQuicksandVar {
             }
 
             if (notFlyingPlayer) {
-                thisEntity.setOnGround(true);
+                //thisEntity.setOnGround(true);
             }
         }
     }

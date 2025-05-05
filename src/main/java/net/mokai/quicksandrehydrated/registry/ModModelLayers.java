@@ -9,6 +9,10 @@ public class ModModelLayers {
             new ResourceLocation(QuicksandRehydrated.MOD_ID, "hunnibee_layer"), "main");
     public static final ModelLayerLocation TAR_GOLEM_LAYER = new ModelLayerLocation(
             new ResourceLocation(QuicksandRehydrated.MOD_ID, "tar_golem_layer"), "main");
+    public static final ModelLayerLocation CAVE_BLOB_CLEAR_LAYER = new ModelLayerLocation(
+            new ResourceLocation(QuicksandRehydrated.MOD_ID, "cave_blob_clear_layer"), "main");
+    public static final ModelLayerLocation CAVE_BLOB_SOLID_LAYER = new ModelLayerLocation(
+            new ResourceLocation(QuicksandRehydrated.MOD_ID, "cave_blob_solid_layer"), "main");
 
     public static final ModelLayerLocation STICKY_SLIME_LAYER = new ModelLayerLocation(
             new ResourceLocation(QuicksandRehydrated.MOD_ID, "sticky_slime_layer"), "main");

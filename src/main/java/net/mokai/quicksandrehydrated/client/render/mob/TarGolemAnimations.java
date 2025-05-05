@@ -8,7 +8,7 @@ import net.minecraft.client.animation.KeyframeAnimations;
 /**
  * Made with Blockbench 4.10.2
  * Exported for Minecraft version 1.19 or later with Mojang mappings
- * @author Author
+ * @author PoweredByGif
  */
 public class TarGolemAnimations {
 	public static final AnimationDefinition tar_golem_idle = AnimationDefinition.Builder.withLength(0.0F).looping()

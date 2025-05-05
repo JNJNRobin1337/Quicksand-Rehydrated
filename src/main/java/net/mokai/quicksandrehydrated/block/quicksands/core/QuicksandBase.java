@@ -264,7 +264,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
                     // if the player is flying ... they shouldn't be set on ground! cause then they
                     // can't fly.
                     // quicksand effects are still dealt, above, though.
-                    pEntity.setOnGround(true);
+                    //pEntity.setOnGround(true);
                 }
 
             } else {

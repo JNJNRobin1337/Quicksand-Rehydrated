@@ -82,6 +82,7 @@ public class PlayerMixin implements playerStruggling {
         Player player = (Player)(Object) this;
         entityQuicksandVar QuicksandVarEntity = (entityQuicksandVar) player;
         playerStruggling strugglingPlayer = (playerStruggling) player;
+        System.out.println("attemptStruggle()");
 
         if (QuicksandVarEntity.getInQuicksand()) {
 
@@ -145,7 +146,7 @@ public class PlayerMixin implements playerStruggling {
     {
 
         Player player = (Player)(Object) this;
-
+        //System.out.println("tickStruggleCooldown(CallbackInfo ci)");
         this.velPosition1 = this.velPosition0; // 1 = previous
         this.velPosition0 = player.position(); // 0 = "current"
 
@@ -162,6 +163,7 @@ public class PlayerMixin implements playerStruggling {
         }
 
         if (inQuicksand) {
+
             if (gravity != null && !gravity.hasModifier(GRAVITY_MODIFIER_QUICKSAND)) {
                 gravity.addTransientModifier(GRAVITY_MODIFIER_QUICKSAND);
             }
@@ -172,9 +174,10 @@ public class PlayerMixin implements playerStruggling {
             }
         }
 
-//        if (gravity != null && gravity.hasModifier(GRAVITY_MODIFIER_QUICKSAND)) {
-//            player.displayClientMessage(Component.literal("has quicksand grav modifier"), false);
-//        }
+        /*
+        if (gravity != null && gravity.hasModifier(GRAVITY_MODIFIER_QUICKSAND)) {
+            player.displayClientMessage(Component.literal("has quicksand grav modifier"), false);
+        }*/
 
         if (player.level().isClientSide()) {
 
