@@ -2,8 +2,11 @@
   "replace": false,
   "values": [
     "qsrehydrated:quicksand",
-    "qsrehydrated:soft_quicksand",
     "qsrehydrated:living_slime",
+    "qsrehydrated:soft_quicksand",
+    "qsrehydrated:bog",
+    "qsrehydrated:peat_bog",
+    "qsrehydrated:mossy_peat_bog",
     "qsrehydrated:thin_mud",
     "qsrehydrated:shallow_mud",
     "qsrehydrated:deep_mud",
@@ -23,8 +26,6 @@
     "qsrehydrated:purple_quickrug",
     "qsrehydrated:red_quickrug",
     "qsrehydrated:white_quickrug",
-    "qsrehydrated:yellow_quickrug",
-    "qsrehydrated:mossy_peat_bog",
-    "qsrehydrated:peat_bog"
+    "qsrehydrated:yellow_quickrug"
   ]
 }

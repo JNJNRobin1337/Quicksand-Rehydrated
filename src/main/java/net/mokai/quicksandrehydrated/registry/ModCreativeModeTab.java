@@ -22,14 +22,23 @@ public class ModCreativeModeTab {
     public static RegistryObject<CreativeModeTab> QUICKSAND_TAB;
 
     public static void setupCreativeTab() {
-        QUICKSAND_TAB = CREATIVE_TABS.register("quicksand_messes_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModBlocks.QUICKSAND.get().asItem()))
-                    .title(Component.translatable("creativetab.qsrehydrated.quicksand_messes_tab"))
+
+        QUICKSAND_TAB = CREATIVE_TABS.register("quicksand_items_tab",
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.CRANBERRY.get().asItem()))
+                    .title(Component.translatable("creativetab.qsrehydrated.quicksand_items_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.acceptAll(ModBlocks.setupCreativeGroups());
                         pOutput.acceptAll(ModItems.setupCreativeGroups());
                     })
                     .build());
+
+        QUICKSAND_TAB = CREATIVE_TABS.register("quicksand_messes_tab",
+                () -> CreativeModeTab.builder().icon(() -> new ItemStack(QuicksandRegistry.QUICKSAND.get().asItem()))
+                        .title(Component.translatable("creativetab.qsrehydrated.quicksand_messes_tab"))
+                        .displayItems((pParameters, pOutput) -> {
+                            pOutput.acceptAll(QuicksandRegistry.setupCreativeGroups());
+                        })
+                        .build());
     }
 
 

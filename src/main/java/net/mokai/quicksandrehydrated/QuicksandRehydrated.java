@@ -36,6 +36,7 @@ public class QuicksandRehydrated {
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        QuicksandRegistry.register(modEventBus);
         ModFluids.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModMenuTypes.register(modEventBus);
@@ -45,6 +46,7 @@ public class QuicksandRehydrated {
         ModLootModifiers.register(modEventBus);
         ModSounds.register(modEventBus);
         ModCreativeModeTab.register(modEventBus);
+
 
         modEventBus.addListener(this::commonSetup);
 
