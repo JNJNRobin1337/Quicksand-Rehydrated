@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "qsrehydrated:block/cattail_reeds"
+    "layer0": "qsrehydrated:block/cattails_1"
   }
 }

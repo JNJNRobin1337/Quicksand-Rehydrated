@@ -37,7 +37,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> DUCKWEED_FLOWERS = registerBlock("duckweed_flowers", () -> new Duckweed(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().replaceable().sound(SoundType.GRASS).instabreak()));
     public static final RegistryObject<Block> PEAT_BOG_BUSH = registerBlock("peat_bog_bush", () -> new PeatBogBush(BlockBehaviour.Properties.copy(Blocks.GRASS)));
     public static final RegistryObject<Block> FERN_BUSH = registerBlock("fern_bush", () -> new FernBush(BlockBehaviour.Properties.copy(Blocks.GRASS)));
-    public static final RegistryObject<Block> CATTAIL_REEDS = registerBlock("cattail_reeds", () -> new CattailReeds(BlockBehaviour.Properties.copy(Blocks.GRASS)));
+    public static final RegistryObject<Block> CATTAIL_REEDS = registerBlock("cattails", () -> new Cattails(BlockBehaviour.Properties.copy(Blocks.GRASS)));
     public static final RegistryObject<Block> BRANCH = registerBlock("muddy_branch", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noCollission().noOcclusion().instabreak()));
 
 

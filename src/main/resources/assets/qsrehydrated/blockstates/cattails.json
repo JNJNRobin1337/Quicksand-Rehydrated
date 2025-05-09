@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "layer=0": { "model": "qsrehydrated:block/cattails_0" },
+    "layer=1": { "model": "qsrehydrated:block/cattails_1" },
+    "layer=2": { "model": "qsrehydrated:block/cattails_2" }
+  }
+}
