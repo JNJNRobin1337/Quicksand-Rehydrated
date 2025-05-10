@@ -46,10 +46,7 @@
   "block.qsrehydrated.duckweed_flowers": "Duckweed Flowers",
   "block.qsrehydrated.peat_bog_bush": "Moor Grass",
   "block.qsrehydrated.fern_bush": "Fern Bush",
-  "block.qsrehydrated.branch_1": "Muddy Branch",
-  "block.qsrehydrated.branch_2": "Muddy Branch",
-  "block.qsrehydrated.branch_3": "Muddy Branch",
-  "block.qsrehydrated.branch_4": "Muddy Branch",
+  "block.qsrehydrated.muddy_branch": "Muddy Branch",
 
   "block.qsrehydrated.bog": "Bog",
   "item.qsrehydrated.bog_bucket": "Bog Bucket",
@@ -81,6 +78,7 @@
   "block.qsrehydrated.wax_drip": "Wax Drip",
   "block.qsrehydrated.dead_lieaves": "Dead Leaves",
   "block.qsrehydrated.cattails": "Cattail Reeds",
+  "block.qsrehydrated.cranberry_bush": "Cranberry Bush",
 
 
   "block.qsrehydrated.mixer": "Mess Mixer",
