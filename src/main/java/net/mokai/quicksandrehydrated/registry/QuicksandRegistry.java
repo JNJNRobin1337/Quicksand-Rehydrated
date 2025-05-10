@@ -128,6 +128,7 @@ public class QuicksandRegistry {
             .setWobbleMove(.6)
             .setWobbleTugHorizontal(.4)
             .setWobbleTugVertical(0)
+            .setCoverageTexture("peat_bog_coverage")
     ));
 
     public static final RegistryObject<Block> PEAT_BOG = registerBlock("peat_bog", () -> new MossyPeatBog(muddyBlockBehavior, new QuicksandBehavior()
@@ -139,6 +140,7 @@ public class QuicksandRegistry {
             .setWobbleTugHorizontal(.4)
 
             .setBubbleChance(.9)
+            .setCoverageTexture("peat_bog_coverage")
     ));
 
 

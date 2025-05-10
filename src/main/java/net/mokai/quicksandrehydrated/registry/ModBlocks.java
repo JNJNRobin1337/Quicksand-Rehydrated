@@ -39,6 +39,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> FERN_BUSH = registerBlock("fern_bush", () -> new FernBush(BlockBehaviour.Properties.copy(Blocks.GRASS)));
     public static final RegistryObject<Block> CATTAIL_REEDS = registerBlock("cattails", () -> new Cattails(BlockBehaviour.Properties.copy(Blocks.GRASS)));
     public static final RegistryObject<Block> BRANCH = registerBlock("muddy_branch", () -> new MuddyBranch(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noCollission().noOcclusion().instabreak()));
+    public static final RegistryObject<Block> CRANBERRY_BUSH = BLOCKS.register("cranberry_bush", () -> new CranBerryBush(BlockBehaviour.Properties.copy(Blocks.SWEET_BERRY_BUSH).noOcclusion()));
 
 
 
