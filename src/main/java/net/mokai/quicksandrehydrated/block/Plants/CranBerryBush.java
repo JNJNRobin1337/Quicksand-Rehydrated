@@ -41,28 +41,31 @@ public class CranBerryBush extends SweetBerryBushBlock {
         super(properties);
     }
 
-    public ItemStack getCloneItemStack(BlockGetter p_57256_, BlockPos p_57257_, BlockState p_57258_) {
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter getter, BlockPos pos, BlockState state) {
         return new ItemStack(ModItems.CRANBERRY.get());
     }
 
-    public InteractionResult use(BlockState p_57275_, Level p_57276_, BlockPos p_57277_, Player p_57278_, InteractionHand p_57279_, BlockHitResult p_57280_) {
-        int i = (Integer)p_57275_.getValue(AGE);
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+        int i = (Integer)state.getValue(AGE);
         boolean flag = i == 3;
-        if (!flag && p_57278_.getItemInHand(p_57279_).is(Items.BONE_MEAL)) {
+        if (!flag && player.getItemInHand(hand).is(Items.BONE_MEAL)) {
             return InteractionResult.PASS;
         } else if (i > 1) {
-            int j = 1 + p_57276_.random.nextInt(2);
-            popResource(p_57276_, p_57277_, new ItemStack(ModItems.CRANBERRY.get(), j + (flag ? 1 : 0)));
-            p_57276_.playSound((Player)null, p_57277_, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + p_57276_.random.nextFloat() * 0.4F);
-            BlockState blockstate = (BlockState)p_57275_.setValue(AGE, 1);
-            p_57276_.setBlock(p_57277_, blockstate, 2);
-            p_57276_.gameEvent(GameEvent.BLOCK_CHANGE, p_57277_, GameEvent.Context.of(p_57278_, blockstate));
-            return InteractionResult.sidedSuccess(p_57276_.isClientSide);
+            int j = 1 + level.random.nextInt(2);
+            popResource(level, pos, new ItemStack(ModItems.CRANBERRY.get(), j + (flag ? 1 : 0)));
+            level.playSound((Player)null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
+            BlockState blockstate = (BlockState)state.setValue(AGE, 1);
+            level.setBlock(pos, blockstate, 2);
+            level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, blockstate));
+            return InteractionResult.sidedSuccess(level.isClientSide);
         } else {
-            return super.use(p_57275_, p_57276_, p_57277_, p_57278_, p_57279_, p_57280_);
+            return super.use(state, level, pos, player, hand, result);
         }
     }
 
+    @Override
     protected boolean mayPlaceOn(BlockState state, BlockGetter getter, BlockPos pos) {
         return state.is(ModTags.Blocks.PEAT_BOG_BUSH) || super.mayPlaceOn(state, getter, pos);
     }

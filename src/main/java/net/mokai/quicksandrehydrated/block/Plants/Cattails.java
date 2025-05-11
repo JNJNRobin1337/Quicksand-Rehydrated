@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.mokai.quicksandrehydrated.util.ModTags;
 
 public class Cattails extends BushBlock implements BonemealableBlock {
 
@@ -116,4 +118,8 @@ public class Cattails extends BushBlock implements BonemealableBlock {
         popResource(worldIn, pos, new ItemStack(this));
     }
 
+    @Override
+    protected boolean mayPlaceOn(BlockState state, BlockGetter getter, BlockPos pos) {
+        return state.is(ModTags.Blocks.PEAT_BOG_BUSH) || super.mayPlaceOn(state, getter, pos);
+    }
 }

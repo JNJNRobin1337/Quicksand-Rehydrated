@@ -25,7 +25,7 @@ public class ModItems {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, QuicksandRehydrated.MOD_ID);
 
-    public static final RegistryObject<Item> CRANBERRY = ITEMS.register("cranberries", () -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(1).saturationMod(1f).fast().build())));
+    public static final RegistryObject<Item> CRANBERRY = ITEMS.register("cranberries", () -> new ItemNameBlockItem(ModBlocks.CRANBERRY_BUSH.get(), new Item.Properties().food(new FoodProperties.Builder().nutrition(1).saturationMod(1f).fast().build())));
     public static final RegistryObject<Item> ROPE = ITEMS.register("rope", () -> new Rope(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> MUSIC_DISC = ITEMS.register("music_disc_flight", () -> new RecordItem(1, ModSounds.FLIGHT_DISK, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 1540));
     public static final RegistryObject<Item> QUICKSAND_BOOK = ITEMS.register("quicksand_book", () -> new QuicksandBook(new Item.Properties().stacksTo(1)));
