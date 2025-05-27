@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#qsrehydrated:has_quicksand_pit",
+  "features": "qsrehydrated:quicksand_pit",
+  "step": "surface_structures"
+}

@@ -7,22 +7,30 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraftforge.registries.DeferredRegister;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
-import net.minecraft.core.Registry;
+import net.mokai.quicksandrehydrated.worldgen.feature.QuicksandPitConfiguration;
 
 
 public class ModConfiguredFeatures {
-    //public static final ResourceKey<ConfiguredFeature<?, ?>> EBONY_KEY = registerKey("ebony");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> QUICKSAND_PIT_KEY = registerKey("quicksand_pit");
 
     public static void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
-
-//        register(context, EBONY_KEY, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
-//                BlockStateProvider.simple(ModBlocks.EBONY_LOG.get()),
-//                new StraightTrunkPlacer(5, 6, 3),
-//                BlockStateProvider.simple(ModBlocks.EBONY_LEAVES.get()),
-//                new BlobFoliagePlacer(ConstantInt.of(2), ConstantInt.of(0), 4),
-//                new TwoLayersFeatureSize(1, 0, 2)).build());
+        // Create a default configuration for the quicksand pit feature
+        // This will be overridden by the JSON configuration if provided
+        QuicksandPitConfiguration defaultConfig = new QuicksandPitConfiguration(
+                QuicksandPitConfiguration.DEFAULT_BLOCK,
+                QuicksandPitConfiguration.DEFAULT_MIN_RADIUS,
+                QuicksandPitConfiguration.DEFAULT_MAX_RADIUS,
+                QuicksandPitConfiguration.DEFAULT_MIN_DEPTH,
+                QuicksandPitConfiguration.DEFAULT_MAX_DEPTH,
+                QuicksandPitConfiguration.DEFAULT_IRREGULARITY,
+                QuicksandPitConfiguration.DEFAULT_HAS_BORDER,
+                java.util.Optional.ofNullable(QuicksandPitConfiguration.DEFAULT_BORDER_BLOCK),
+                java.util.Optional.of(QuicksandPitConfiguration.DEFAULT_REPLACEABLE_BLOCKS)
+        );
+        
+        // Register the quicksand pit feature with the default configuration
+        register(context, QUICKSAND_PIT_KEY, ModFeatures.QUICKSAND_PIT.get(), defaultConfig);
     }
 
 

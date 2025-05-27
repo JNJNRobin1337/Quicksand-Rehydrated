@@ -1,29 +1,15 @@
 package net.mokai.quicksandrehydrated.registry;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.event.ItemStackedOnOtherEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.village.VillagerTradesEvent;
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.mokai.quicksandrehydrated.entity.EntityBubble;
-import net.mokai.quicksandrehydrated.particle.QuicksandBubbleParticle;
-
-import net.mokai.quicksandrehydrated.entity.EntityHunnibee;
-import net.mokai.quicksandrehydrated.particle.TestDustParticle;
+import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 
 import java.util.List;
 

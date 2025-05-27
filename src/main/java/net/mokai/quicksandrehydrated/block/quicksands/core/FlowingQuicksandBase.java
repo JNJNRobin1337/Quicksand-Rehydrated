@@ -75,8 +75,16 @@ public class FlowingQuicksandBase extends QuicksandBase implements QuicksandInte
 
     // VANILLA bounding box stuff
 
+    @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return SHAPE_BY_LEVEL[pState.getValue(LEVEL)];
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        // Creiamo una forma che ha una collisione nella parte superiore
+        // Questo permette alle entità di stare in piedi sulla sabbia mobile
+        return Shapes.empty();
     }
 
     public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {

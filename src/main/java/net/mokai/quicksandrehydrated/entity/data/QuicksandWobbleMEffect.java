@@ -55,9 +55,7 @@ public class QuicksandWobbleMEffect extends QuicksandEffect {
 
             wobbleMomentum = wobbleMomentum.add(wobbleMomentumMomentum);
 
-            System.out.println(wobbleMomentum);
-            System.out.println(wobbleMomentumMomentum);
-            System.out.println("-----");
+            // Rimuovi i log di sistema per migliorare le prestazioni
 
             double scale = 10.0;
             double len = wobbleMomentum.length()*scale;

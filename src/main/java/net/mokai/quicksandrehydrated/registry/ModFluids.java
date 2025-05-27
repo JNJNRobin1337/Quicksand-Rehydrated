@@ -1,11 +1,11 @@
 package net.mokai.quicksandrehydrated.registry;
 
 import net.minecraftforge.fluids.FluidType;
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 //import net.mokai.quicksandrehydrated.fluid.quicksands.DryQuicksand;
 //import net.mokai.quicksandrehydrated.fluid.quicksands.RedQuicksand;
 

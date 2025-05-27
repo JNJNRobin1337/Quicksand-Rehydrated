@@ -1,14 +1,5 @@
 package net.mokai.quicksandrehydrated.integration;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
-import net.mokai.quicksandrehydrated.recipe.FluidMixerRecipes;
-
-import java.util.List;
-import java.util.Objects;
 /*
 @JeiPlugin
 public class JEIQuicksandPlugin { //implements IModPlugin {

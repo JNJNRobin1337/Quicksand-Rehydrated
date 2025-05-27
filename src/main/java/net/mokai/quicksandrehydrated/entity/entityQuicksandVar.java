@@ -58,5 +58,8 @@ public interface entityQuicksandVar {
 
 
     BlockPos getStuckBlock(Entity pEntity);
-
+    
+    boolean stuckBlockValid(BlockPos pPos, Entity pEntity);
+    
+    boolean entityCanStepOut(Entity pEntity);
 }

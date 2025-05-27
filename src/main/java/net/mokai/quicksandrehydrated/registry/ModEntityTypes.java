@@ -5,22 +5,16 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.mokai.quicksandrehydrated.entity.EntityBubble;
-import net.mokai.quicksandrehydrated.entity.EntityCaveBlob;
 import net.mokai.quicksandrehydrated.entity.EntityHunnibee;
 import net.mokai.quicksandrehydrated.entity.EntityTarGolem;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class ModEntityTypes {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, QuicksandRehydrated.MOD_ID);

@@ -13,8 +13,6 @@ import net.mokai.quicksandrehydrated.client.render.mob.*;
 import net.mokai.quicksandrehydrated.entity.*;
 
 import static net.mokai.quicksandrehydrated.QuicksandRehydrated.MOD_ID;
-import static net.mokai.quicksandrehydrated.registry.ModEntityTypes.HUNNIBEE;
-import static net.mokai.quicksandrehydrated.registry.ModEntityTypes.TAR_GOLEM;
 
 @Mod.EventBusSubscriber (modid = MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEntitySetup {

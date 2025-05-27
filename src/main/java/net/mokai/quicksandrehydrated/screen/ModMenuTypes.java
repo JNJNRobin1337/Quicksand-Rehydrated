@@ -1,6 +1,5 @@
 package net.mokai.quicksandrehydrated.screen;
 
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -9,6 +8,7 @@ import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 
 public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS =
