@@ -50,43 +50,60 @@ public class EasingHandler {
 
 
     public static double getDepth(Entity pEntity, Level pLevel, BlockPos pPos, double offset) {
-
-        double playerY = pEntity.getPosition(1).y();
-        double depth;
-
-        BlockPos playercube;
-        double currentHeight = pPos.getY();
-
-        do {
-            currentHeight++;
-            BlockPos check = new BlockPos(pPos.getX(), (int) currentHeight, pPos.getZ());
+        // Ottimizzazione: Usa direttamente la posizione Y dell'entità invece di getPosition(1)
+        double playerY = pEntity.getY();
+        double playerHeight = pEntity.getBbHeight();
+        
+        // Limita la ricerca verso l'alto per evitare loop infiniti
+        BlockPos playercube = pPos;
+        int maxHeight = pPos.getY() + 10; // Limita a 10 blocchi sopra la posizione attuale
+        
+        for (int y = pPos.getY() + 1; y <= maxHeight; y++) {
+            BlockPos check = new BlockPos(pPos.getX(), y, pPos.getZ());
+            if (!(pLevel.getBlockState(check).getBlock() instanceof QuicksandBase)) {
+                playercube = check;
+                break;
+            }
             playercube = check;
-        } while (pLevel.getBlockState(playercube).getBlock() instanceof QuicksandBase);
-
-        depth = playercube.getY() - playerY - offset;
-
-        return depth;
-
+        }
+        
+        // Calcola la profondità standard (dai piedi)
+        double standardDepth = playercube.getY() - playerY - offset;
+        
+        // Calcola anche la profondità dalla testa
+        double headY = playerY + playerHeight;
+        double headDepth = playercube.getY() - headY - offset;
+        
+        // Se la testa è sotto la superficie, usa la profondità standard
+        // Altrimenti, usa una formula che considera sia la posizione dei piedi che della testa
+        if (headDepth > 0) {
+            // La testa è sotto la superficie, usa la profondità standard
+            return standardDepth;
+        } else {
+            // La testa è sopra la superficie, calcola una profondità proporzionale
+            // alla parte del corpo che è effettivamente immersa
+            double immersedPortion = (playerHeight + headDepth) / playerHeight;
+            return standardDepth * immersedPortion;
+        }
     }
 
     public static double getDepthPos(Vec3 worldPos, Level pLevel, BlockPos pPos, double offset) {
-
         double playerY = worldPos.y();
-        double depth;
-
-        BlockPos playercube;
-        double currentHeight = pPos.getY();
-
-        do {
-            currentHeight++;
-            BlockPos check = new BlockPos(pPos.getX(), (int) currentHeight, pPos.getZ());
+        
+        // Limita la ricerca verso l'alto per evitare loop infiniti
+        BlockPos playercube = pPos;
+        int maxHeight = pPos.getY() + 10; // Limita a 10 blocchi sopra la posizione attuale
+        
+        for (int y = pPos.getY() + 1; y <= maxHeight; y++) {
+            BlockPos check = new BlockPos(pPos.getX(), y, pPos.getZ());
+            if (!(pLevel.getBlockState(check).getBlock() instanceof QuicksandBase)) {
+                playercube = check;
+                break;
+            }
             playercube = check;
-        } while (pLevel.getBlockState(playercube).getBlock() instanceof QuicksandBase);
-
-        depth = playercube.getY() - playerY - offset;
-
-        return depth;
-
+        }
+        
+        return playercube.getY() - playerY - offset;
     }
 
 

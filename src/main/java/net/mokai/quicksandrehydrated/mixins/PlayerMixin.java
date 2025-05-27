@@ -1,19 +1,16 @@
 package net.mokai.quicksandrehydrated.mixins;
 
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
+import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
+import net.mokai.quicksandrehydrated.entity.coverage.CoverageSerializer;
 import net.mokai.quicksandrehydrated.entity.coverage.PlayerCoverage;
 import net.mokai.quicksandrehydrated.entity.entityQuicksandVar;
 import net.mokai.quicksandrehydrated.entity.playerStruggling;
@@ -89,7 +86,7 @@ public class PlayerMixin implements playerStruggling {
             // find the block the player is stuck in
             BlockPos bp = QuicksandVarEntity.getStuckBlock(player);
 
-            if (bp != null) {
+            if (bp != null && QuicksandVarEntity.stuckBlockValid(bp, player)) {
 
                 // can only do things if it exists, of course.
 
@@ -141,6 +138,40 @@ public class PlayerMixin implements playerStruggling {
 
 
 
+    /**
+     * Save player data when the player is saved
+     */
+    @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
+    public void savePlayerData(CompoundTag compound, CallbackInfo ci) {
+        try {
+            // Save coverage data
+            CompoundTag coverageTag = CoverageSerializer.serializeCoverage(this.coverage);
+            compound.put("qsrehydrated_coverage", coverageTag);
+        } catch (Exception e) {
+            // Log error but don't crash the game
+            System.err.println("[QuicksandRehydrated] Error saving player coverage data: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Load player data when the player is loaded
+     */
+    @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
+    public void loadPlayerData(CompoundTag compound, CallbackInfo ci) {
+        try {
+            // Load coverage data if it exists
+            if (compound.contains("qsrehydrated_coverage")) {
+                CompoundTag coverageTag = compound.getCompound("qsrehydrated_coverage");
+                this.coverage = CoverageSerializer.deserializeCoverage(coverageTag);
+            }
+        } catch (Exception e) {
+            // Log error but don't crash the game
+            System.err.println("[QuicksandRehydrated] Error loading player coverage data: " + e.getMessage());
+            // Initialize a new coverage if loading fails
+            this.coverage = new PlayerCoverage();
+        }
+    }
+
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickStruggleCooldown(CallbackInfo ci)
     {
@@ -159,7 +190,7 @@ public class PlayerMixin implements playerStruggling {
 
         if (inQuicksand) {
             BlockPos stuckPos = QuicksandVarEntity.getStuckBlock(player);
-            inQuicksand = (stuckPos != null);
+            inQuicksand = (stuckPos != null && QuicksandVarEntity.stuckBlockValid(stuckPos, player));
         }
 
         if (inQuicksand) {

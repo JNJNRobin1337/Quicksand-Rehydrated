@@ -4,9 +4,12 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingBreatheEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -16,11 +19,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
+import net.mokai.quicksandrehydrated.entity.coverage.WashingSystem;
 import net.mokai.quicksandrehydrated.loot.ModLootModifiers;
 import net.mokai.quicksandrehydrated.networking.ModMessages;
 import net.mokai.quicksandrehydrated.registry.*;
 import net.mokai.quicksandrehydrated.screen.MixerScreen;
 import net.mokai.quicksandrehydrated.screen.ModMenuTypes;
+import net.mokai.quicksandrehydrated.worldgen.placement.ModPlacementModifierTypes;
 
 import static net.mokai.quicksandrehydrated.util.ModTags.Blocks.QUICKSAND_DROWNABLE;
 
@@ -46,6 +51,8 @@ public class QuicksandRehydrated {
         ModLootModifiers.register(modEventBus);
         ModSounds.register(modEventBus);
         ModCreativeModeTab.register(modEventBus);
+        ModFeatures.register(modEventBus);
+        ModPlacementModifierTypes.register(modEventBus);
 
 
         modEventBus.addListener(this::commonSetup);
@@ -57,10 +64,11 @@ public class QuicksandRehydrated {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-
-        event.enqueueWork(ModMessages::register);
-        //event.enqueueWork(ModEntityTypes::registerPOIs);
-
+        event.enqueueWork(() -> {
+            ModMessages.register();
+            // Register world generation for quicksand pits
+            ModFeatures.registerWorldGeneration();
+        });
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
@@ -91,7 +99,24 @@ public class QuicksandRehydrated {
             }
 
         }
+        
+        @SubscribeEvent
+        public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+            // Process at the end of the tick
+            if (event.phase == TickEvent.Phase.END) {
+                Player player = event.player;
+                Level level = player.level();
+                
+                // Apply washing effect if player is in water
+                // This needs to run on both client and server sides
+                // - Server side: for actual coverage removal logic
+                // - Client side: for particle effects
+                WashingSystem.applyWashingEffect(player, level);
+            }
+        }
 
+        // Commentiamo temporaneamente questo evento per verificare se è la causa del problema
+        /*
         @SubscribeEvent
         public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
             // Your custom logic goes here
@@ -105,18 +130,17 @@ public class QuicksandRehydrated {
             }
             System.out.println(entity.getName() + " jumped!");
 
-            BlockPos onBlock = entity.getOnPosLegacy();
-            BlockState onState = entity.level().getBlockState(onBlock);
+            // Verifica se l'entità è effettivamente su un blocco di sabbie mobili
+            // Usa la posizione attuale dell'entità invece di getOnPosLegacy()
+            BlockPos entityPos = entity.blockPosition().below();
+            BlockState blockState = entity.level().getBlockState(entityPos);
 
-            if (onState.getBlock() instanceof QuicksandBase) {
-
-                QuicksandBase quicksand = (QuicksandBase) onState.getBlock();
-                quicksand.sinkableJumpOff(onState, entity.level(), onBlock, entity);
-
+            if (blockState.getBlock() instanceof QuicksandBase) {
+                QuicksandBase quicksand = (QuicksandBase) blockState.getBlock();
+                quicksand.sinkableJumpOff(blockState, entity.level(), entityPos, entity);
             }
-
-
         }
+        */
 
     }
 

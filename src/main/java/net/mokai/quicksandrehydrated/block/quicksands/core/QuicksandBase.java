@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.mokai.quicksandrehydrated.QuicksandRehydrated;
@@ -26,7 +27,6 @@ import net.mokai.quicksandrehydrated.entity.playerStruggling;
 import net.mokai.quicksandrehydrated.util.EasingHandler;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.Random;
 
 import static net.mokai.quicksandrehydrated.util.ModTags.Blocks.QUICKSAND_DROWNABLE;
@@ -214,95 +214,96 @@ public class QuicksandBase extends Block implements QuicksandInterface {
     public void applyQuicksandEffects(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos,
             @NotNull Entity pEntity) {
 
+        // Ottimizzazione: Ignora le bolle per evitare calcoli inutili
         if (pEntity instanceof EntityBubble) {
             return;
         }
 
+        // Calcola la profondità solo se necessario
         double depth = getDepth(pLevel, pPos, pEntity);
-        if (depth > 0) {
+        
+        // Anche se la profondità è 0 o negativa, potremmo avere la parte superiore del corpo nella sabbia mobile
+        // Quindi non facciamo un return immediato, ma usiamo una profondità minima
+        if (depth <= 0) {
+            // Verifica se la parte superiore del corpo è nella sabbia mobile
+            double entityY = pEntity.getY();
+            double entityHeight = pEntity.getBbHeight();
+            double entityTop = entityY + entityHeight;
+            
+            // Se la parte superiore del corpo è sopra il blocco, allora non c'è effetto
+            if (entityTop <= pPos.getY() || entityY >= pPos.getY() + 1.0) {
+                return;
+            }
+            
+            // Altrimenti, usa una profondità minima per applicare comunque gli effetti
+            depth = 0.1;
+        }
 
+        // Applica la copertura solo per i giocatori
+        if (pEntity instanceof Player) {
             trySetCoverage(pEntity);
+        }
 
-            // there are three main effects that happen every tick.
+        // Applica gli effetti principali della sabbia mobile: spessore e affondamento
+        quicksandMomentum(pState, pLevel, pPos, pEntity, depth);
 
-            // first, the quicksand's main effects are applied. Thickness and sinking.
-            quicksandMomentum(pState, pLevel, pPos, pEntity, depth);
-
-
-
-            // magic stuff to do fun effects ...
-            entityQuicksandVar qsE = (entityQuicksandVar) pEntity;
-
-            // TODO Move this to using a map instead of an array?
-            // instead of just adding all the effects at the beginning, and blindly running all the effects the entity has,
-            // should probably instead check for all the ones that Should be there, and run those
-            // and add them if they don't exist
+        // Applica effetti speciali
+        entityQuicksandVar qsE = (entityQuicksandVar) pEntity;
+        
+        // Ottimizzazione: Verifica se ci sono effetti da applicare
+        if (!qsE.getQuicksandEffectManager().effects.isEmpty()) {
             for (QuicksandEffect e : qsE.getQuicksandEffectManager().effects) {
                 e.effectEntity(pPos, pEntity, getQuicksandBehavior());
             }
-
-
-
-
-
-            // Some movement stuff. Dealing with whether the entity is "OnGround"
-            // whether they can jump, and step out onto a solid block.
-
-
-
-            // Okay, so letting people jump on the top layer of the quicksand lets everyone just hold spacebar and jump over it all. I just commented it all out to disable it, and works better (tm)
-
-            if (canStepOut(depth)) {
-
-                boolean playerFlying = false;
-                if (pEntity instanceof Player) {
-                    Player p = (Player) pEntity;
-                    playerFlying = p.getAbilities().flying;
-                }
-
-                if (!playerFlying) {
-                    // if the player is flying ... they shouldn't be set on ground! cause then they
-                    // can't fly.
-                    // quicksand effects are still dealt, above, though.
-                    //pEntity.setOnGround(true);
-                }
-
-            } else {
-                // sets to false even if they're at bottom (touching block underneath the QS)
-                pEntity.setOnGround(false);
-                pEntity.resetFallDistance();
-            }
-
-            pEntity.resetFallDistance();
-
         }
 
+        // Gestione del movimento e dello stato "onGround"
+        if (!canStepOut(depth)) {
+            // Se l'entità non può uscire, imposta onGround a false
+            pEntity.setOnGround(false);
+        }
+        
+        // Resetta sempre la distanza di caduta
+        pEntity.resetFallDistance();
     }
 
     public void trySetCoverage(Entity pEntity) {
-
         // Set a section of coverage, bottom to the current depth value (as a percentage)
-        // It's called "try" set coverage, but it does it every time, no matter what.
-        // Ideally, some kind of check should be done so that it doesn't edit it if it doesn't need to.
-
-        // ... though, that *could* be done in the PlayerCoverage class instead of here.
+        // Now with optimization to avoid unnecessary updates
 
         if (pEntity instanceof Player) {
-
             playerStruggling pS = (playerStruggling) pEntity;
-
             PlayerCoverage pC = pS.getCoverage();
+            
+            if (pC == null) return;
 
             double depth = getDepth(pEntity.level(), pEntity.blockPosition(), pEntity);
             double depth_percent = clamp(depth, 0.0, 2.0)/2.0;
 
+            // Assicuriamoci che il coverage inizi da 0 (il punto più basso dei piedi)
             int begin = 0;
-            int end = (int) (32 * depth_percent);
-            end = clamp(end, 0, 32);
+            // Aggiungiamo +1 per assicurarci che il primo pixel sia sempre coperto
+            int end = (int) (32 * depth_percent) + 1;
+            end = clamp(end, 1, 32);
 
+            // Check if we already have an entry with the same values to avoid unnecessary updates
             ResourceLocation tex = new ResourceLocation(QuicksandRehydrated.MOD_ID, QSBehavior.getCoverageTex());
-            pC.addCoverageEntry(new CoverageEntry(begin, end, tex));
-
+            
+            // Check if we need to update
+            boolean needsUpdate = true;
+            
+            // Look for an existing entry with the same texture and similar range
+            for (CoverageEntry entry : pC.coverageEntries) {
+                if (entry.texture.equals(tex) && entry.begin == begin && Math.abs(entry.end - end) <= 1) {
+                    // We already have a very similar entry, no need to update
+                    needsUpdate = false;
+                    break;
+                }
+            }
+            
+            if (needsUpdate) {
+                pC.addCoverageEntry(new CoverageEntry(begin, end, tex));
+            }
         }
     }
     public void firstTouch(BlockPos pPos, Entity pEntity, Level pLevel) {
@@ -315,15 +316,10 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
         qEM.clear();
 
-        System.out.print("Adding Quicksand Effects for ");
-        System.out.print(getClass().getSimpleName());
-        System.out.println(" ... ");
+        // Rimuovi i log di sistema per migliorare le prestazioni
         for (Class<? extends QuicksandEffect> e : qb.effectsList) {
-            System.out.print("  + ");
-            System.out.println(e.getSimpleName());
             qEM.addEffect(e, pPos, pEntity);
         }
-
     }
 
     public void struggleAttempt(@NotNull BlockState pState, @NotNull Entity pEntity, double struggleAmount) {
@@ -353,18 +349,26 @@ public class QuicksandBase extends Block implements QuicksandInterface {
     }
 
     public void tryApplyCoverage(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Entity pEntity) {
-//        double depth = getDepth(pLevel, pPos, pEntity);
-//        if (depth > 0) {
-//            if (pEntity instanceof Player) {
-//
-//                playerStruggling pS = (playerStruggling) pEntity;
-//                double currentAmount = pS.getCoveragePercent();
-//                double shouldBe = depth/1.875;
-//                if (shouldBe > 1.0) {shouldBe = 1.0;}
-//
-//                if (shouldBe > currentAmount) {pS.setCoveragePercent(shouldBe);}
-//
-//            }
+        double depth = getDepth(pLevel, pPos, pEntity);
+        if (depth > 0) {
+            if (pEntity instanceof Player) {
+                playerStruggling pS = (playerStruggling) pEntity;
+                
+                // Calculate coverage height based on depth
+                double shouldBe = depth/1.875;
+                if (shouldBe > 1.0) {shouldBe = 1.0;}
+                
+                // Convert to pixel height (0-32)
+                int pixelHeight = (int)(shouldBe * 32);
+                
+                // Create a new coverage entry
+                ResourceLocation coverageTexLoc = new ResourceLocation(QuicksandRehydrated.MOD_ID, this.QSBehavior.getCoverageTex());
+                CoverageEntry entry = new CoverageEntry(0, pixelHeight, coverageTexLoc);
+                
+                // Add the coverage entry to the player
+                pS.getCoverage().addCoverageEntry(entry);
+            }
+        }
 //        }
     }
 
@@ -376,27 +380,38 @@ public class QuicksandBase extends Block implements QuicksandInterface {
     public void entityInside(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos,
             @NotNull Entity pEntity) {
 
-        // when an entity is touching a quicksand block ...
+        // Ottimizzazione: Ignora le bolle per evitare calcoli inutili
+        if (pEntity instanceof EntityBubble) {
+            return;
+        }
 
+        // Ottimizzazione: Verifica rapida se l'entità è sopra il blocco
+        boolean isAboveBlock = pEntity.getY() > pPos.getY() + 0.9;
+        
+        // Calcola la profondità solo se necessario
         double depth = getDepth(pLevel, pPos, pEntity);
 
         if (depth > 0) {
-
-            // all that needs to be done is set the fact that this entity is in quicksand.
-            // Entities choose which quicksand block to run the applyQuicksandEffects
-            // function from.
-
+            // Imposta l'entità come "in sabbia mobile"
             entityQuicksandVar es = (entityQuicksandVar) pEntity;
-
-            // more movement variables.
             es.setInQuicksand(true);
-
             pEntity.resetFallDistance();
 
-            tryApplyCoverage(pState, pLevel, pPos, pEntity);
+            // Applica l'affondamento solo se l'entità è sopra la sabbia mobile
+            if (isAboveBlock) {
+                // Ottimizzazione: Calcola la velocità di affondamento una sola volta
+                double sinkSpeed = 0.05 * depth;
+                // Applica solo se la velocità è significativa
+                if (sinkSpeed > 0.001) {
+                    pEntity.setDeltaMovement(pEntity.getDeltaMovement().add(0, -sinkSpeed, 0));
+                }
+            }
 
+            // Applica la copertura solo per i giocatori
+            if (pEntity instanceof Player) {
+                tryApplyCoverage(pState, pLevel, pPos, pEntity);
+            }
         }
-
     }
 
 
@@ -426,13 +441,35 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
 
     public boolean canBeReplaced(BlockState pState, Fluid pFluid) {
-        System.out.println("no replace!");
+        // Rimuovi il log di sistema per migliorare le prestazioni
         return false;
     }
 
     // This needs to be set for quicksand blocks that have Ambient Occlusion
     // small detail but important, IMO
     public VoxelShape getOcclusionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+        return Shapes.block();
+    }
+    
+    // Ottimizzazione: Crea la forma di collisione una sola volta invece di ricrearla ogni volta
+    private static final VoxelShape COLLISION_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.0D, 16.0D);
+    
+    /**
+     * Override the collision shape to make it a non-solid block
+     * This allows the player to sink into the quicksand
+     */
+    @Override
+    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        // Usa la forma predefinita invece di crearla ogni volta
+        return Shapes.empty();
+    }
+    
+    /**
+     * Override the shape for consistent rendering
+     * This maintains the visual appearance of a full block
+     */
+    @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return Shapes.block();
     }
 

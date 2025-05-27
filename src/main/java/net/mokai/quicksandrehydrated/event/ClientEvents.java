@@ -7,9 +7,9 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
+import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.mokai.quicksandrehydrated.client.render.ModRenderTypes;
 import net.mokai.quicksandrehydrated.client.render.StruggleHudOverlay;
 import net.mokai.quicksandrehydrated.client.render.coverage.CoverageAtlasHolder;
@@ -17,7 +17,10 @@ import net.mokai.quicksandrehydrated.client.render.coverage.CoverageLayer;
 import net.mokai.quicksandrehydrated.client.render.coverage.PlayerCoverageDefaultModel;
 import net.mokai.quicksandrehydrated.client.render.coverage.PlayerCoverageSlimModel;
 import net.mokai.quicksandrehydrated.entity.playerStruggling;
+import net.mokai.quicksandrehydrated.particle.QuicksandBubbleParticle;
+import net.mokai.quicksandrehydrated.particle.WashingParticle;
 import net.mokai.quicksandrehydrated.registry.ModModelLayers;
+import net.mokai.quicksandrehydrated.registry.ModParticles;
 import net.mokai.quicksandrehydrated.util.Keybinding;
 
 import java.io.IOException;
@@ -76,6 +79,15 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onKeyRegister(RegisterKeyMappingsEvent event) {
             event.register(Keybinding.STRUGGLE_KEY);
+        }
+        
+        @SubscribeEvent
+        public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
+            // Register quicksand bubble particles
+            event.registerSpriteSet(ModParticles.QUICKSAND_BUBBLE_PARTICLES.get(),
+                    QuicksandBubbleParticle.Provider::new);
+            
+            // Washing particles removed
         }
 
     }

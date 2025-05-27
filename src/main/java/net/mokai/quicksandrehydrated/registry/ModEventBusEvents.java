@@ -1,6 +1,5 @@
 package net.mokai.quicksandrehydrated.registry;
 
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

@@ -1,12 +1,12 @@
 package net.mokai.quicksandrehydrated.datagen;
 
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.mokai.quicksandrehydrated.QuicksandRehydrated;
 
 import java.util.concurrent.CompletableFuture;
 

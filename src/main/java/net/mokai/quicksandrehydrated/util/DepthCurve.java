@@ -1,15 +1,7 @@
 package net.mokai.quicksandrehydrated.util;
-import net.minecraft.client.renderer.entity.ArrowRenderer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.mokai.quicksandrehydrated.QuicksandRehydrated;
-import net.mokai.quicksandrehydrated.block.quicksands.core.QuicksandBase;
-import org.checkerframework.checker.units.qual.A;
 import org.joml.Vector2d;
 
 import java.util.ArrayList;
-import java.util.logging.LogManager;
 
 import static org.joml.Math.clamp;
 
