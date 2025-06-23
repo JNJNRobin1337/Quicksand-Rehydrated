@@ -32,30 +32,44 @@ public class QuicksandPitPlacement extends PlacementFilter {
         int surfaceY = findSurfaceY(level, pos);
         if (surfaceY == -1) return false;
         
+        // Verifica che la superficie sia sopra il livello del mare (y=62)
+        if (surfaceY < 62) {
+            return false;
+        }
+        
         BlockPos surfacePos = new BlockPos(pos.getX(), surfaceY, pos.getZ());
         
         // 2. Verifica che il terreno sia sufficientemente pianeggiante
-        if (!isTerrainFlat(level, surfacePos, 8, random)) return false;
+        // Semplifichiamo questa verifica per aumentare le possibilità di generazione
+        if (!isTerrainFlat(level, surfacePos, 6, random)) return false;
         
         // 3. Verifica che siamo a un'altitudine appropriata
         double heightProbability = getQuicksandProbabilityByHeight(surfaceY);
         if (random.nextDouble() > heightProbability) return false;
         
         // 4. Usa una noise map per la distribuzione naturale
+        // Semplifichiamo questa verifica per aumentare le possibilità di generazione
         if (!shouldGenerateQuicksandPatch(pos.getX(), pos.getZ(), level.getSeed())) return false;
         
         // 5. Bonus di probabilità se siamo in una depressione naturale
-        boolean inDepression = isNaturalDepression(level, surfacePos, 8);
+        boolean inDepression = isNaturalDepression(level, surfacePos, 6);
         
         // 6. Bonus di probabilità se siamo in un percorso di drenaggio
-        boolean inDrainagePath = isWaterDrainagePath(level, surfacePos);
+        // Disabilitiamo temporaneamente questa verifica per aumentare le possibilità di generazione
+        // boolean inDrainagePath = isWaterDrainagePath(level, surfacePos);
+        boolean inDrainagePath = false;
         
         // Decisione finale con bonus per posizioni ideali
-        double baseProbability = 0.7; // 70% di probabilità base (aumentata dal 30%)
-        if (inDepression) baseProbability += 0.2; // +20% se in una depressione
-        if (inDrainagePath) baseProbability += 0.1; // +10% se in un percorso di drenaggio
+        // Aumentiamo al massimo la probabilità base per garantire la generazione
+        double baseProbability = 1.0; // 100% di probabilità base
         
-        return random.nextDouble() < baseProbability;
+        // Stampa di debug
+        System.out.println("[QuicksandPitPlacement] Checking placement at " + pos + ", surfaceY=" + surfaceY + 
+                           ", heightProb=" + heightProbability + ", inDepression=" + inDepression + 
+                           ", finalProb=" + baseProbability);
+        
+        // Forziamo la generazione ritornando sempre true
+        return true;
     }
 
     @Override
@@ -128,35 +142,25 @@ public class QuicksandPitPlacement extends PlacementFilter {
      */
     private double getQuicksandProbabilityByHeight(int y) {
         // Definisci un intervallo di altitudine ideale per le sabbie mobili
-        int minIdealHeight = 60; // Livello del mare (abbassato)
-        int maxIdealHeight = 80; // Aumentato il range ideale
-        
-        // Nessuna sabbia mobile troppo in alto
-        if (y > 120) return 0.0;
+        int minIdealHeight = 62; // Livello del mare
+        int maxIdealHeight = 320; // Aumentato drasticamente il range ideale
         
         // Probabilità massima nell'intervallo ideale
         if (y >= minIdealHeight && y <= maxIdealHeight) {
-            return 0.8; // 80% di probabilità nell'intervallo ideale (aumentato)
+            return 1.0; // 100% di probabilità nell'intervallo ideale
         }
         
-        // Probabilità decrescente all'aumentare dell'altitudine
-        return 0.5 * Math.max(0, 1.0 - (y - maxIdealHeight) / 40.0);
+        // Probabilità alta anche fuori dall'intervallo ideale
+        return 0.9;
     }
     
     /**
      * Usa una funzione di rumore per determinare dove generare le macchie di sabbie mobili
      */
     private boolean shouldGenerateQuicksandPatch(int x, int z, long seed) {
-        // Implementazione semplificata usando Math.sin per simulare il rumore
-        double regionNoise = Math.sin(x * 0.01 + seed) * Math.cos(z * 0.01 + seed * 2);
-        double localNoise = Math.sin(x * 0.1 + seed * 3) * Math.cos(z * 0.1 + seed * 4);
-        
-        // Combina i due livelli di rumore
-        double combinedNoise = (regionNoise + 1) * 0.5 * (localNoise + 1) * 0.5;
-        
-        // Genera sabbie mobili solo in aree dove il rumore è sopra una certa soglia
-        // Soglia abbassata da 0.7 a 0.4 per aumentare la frequenza
-        return combinedNoise > 0.4;
+        // Forziamo la generazione ritornando sempre true
+        // Questo garantirà che le pozze di sabbie mobili si generino ovunque
+        return true;
     }
     
     /**

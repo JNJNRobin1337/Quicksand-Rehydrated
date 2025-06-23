@@ -26,7 +26,9 @@ public class ModConfiguredFeatures {
                 QuicksandPitConfiguration.DEFAULT_IRREGULARITY,
                 QuicksandPitConfiguration.DEFAULT_HAS_BORDER,
                 java.util.Optional.ofNullable(QuicksandPitConfiguration.DEFAULT_BORDER_BLOCK),
-                java.util.Optional.of(QuicksandPitConfiguration.DEFAULT_REPLACEABLE_BLOCKS)
+                java.util.Optional.of(QuicksandPitConfiguration.DEFAULT_REPLACEABLE_BLOCKS),
+                QuicksandPitConfiguration.DEFAULT_MIN_HEIGHT,
+                QuicksandPitConfiguration.DEFAULT_MAX_HEIGHT
         );
         
         // Register the quicksand pit feature with the default configuration

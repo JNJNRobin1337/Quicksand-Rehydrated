@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 
+import java.util.List;
+
 /**
  * Feature that generates a quicksand pit with customizable block type and shape.
  * The shape is highly irregular and random, based on noise and configuration parameters.
@@ -52,14 +54,30 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
             return false; // Couldn't find a valid surface
         }
         
-        // Verifica che l'area sia pianeggiante
+        // Verifica che la superficie sia all'interno del range di altezza specificato
+        if (originSurfaceY < config.minHeight || originSurfaceY > config.maxHeight) {
+            System.out.println("[QuicksandPit] Surface outside height range at " + origin + ", y=" + originSurfaceY + 
+                               " (range: " + config.minHeight + "-" + config.maxHeight + ")");
+            return false;
+        }
+        
+        // Verifica che l'area sia pianeggiante - usiamo un controllo più semplice
         if (!isAreaFlat(level, origin, radius, originSurfaceY)) {
             System.out.println("[QuicksandPit] Area not flat enough at " + origin);
             return false;
         }
         
+        // Verifica che l'area sia circondata dai blocchi specificati nel file JSON
+        if (!isAreaSurroundedByReplaceableBlocks(level, origin, radius, originSurfaceY, config.replaceableBlocks)) {
+            System.out.println("[QuicksandPit] Area not surrounded by replaceable blocks at " + origin);
+            return false;
+        }
+        
         // Set the pit level AT the surface level (not affossato)
+        // Memorizziamo l'altezza esatta della superficie per assicurarci che la pozza sia completamente piatta
         int pitLevel = originSurfaceY;
+        
+        System.out.println("[QuicksandPit] Setting pit level to exact surface height: " + pitLevel);
         
         // Non verifichiamo più che l'area sia circondata da sabbia
         // Ora la feature può generarsi in qualsiasi area
@@ -190,93 +208,51 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
             }
         }
         
-        // Now generate the pit layer by layer, starting from the top
-        System.out.println("[QuicksandPit] Generating pit layer by layer");
+        // Generiamo la pozza in un unico passaggio, non strato per strato
+        System.out.println("[QuicksandPit] Generating pit in a single pass");
         
-        // For each layer, from top to bottom
-        for (int layer = 0; layer < pitDepth + 1; layer++) {
-            System.out.println("[QuicksandPit] Generating layer " + layer);
-            
-            // For each position in our map
-            for (int mapX = 0; mapX < mapSize; mapX++) {
-                for (int mapZ = 0; mapZ < mapSize; mapZ++) {
-                    // If this position is part of the pit
-                    if (pitShape[mapX][mapZ]) {
-                        // Calculate the actual world coordinates
-                        int worldX = origin.getX() + (mapX - (radius + 5));
-                        int worldZ = origin.getZ() + (mapZ - (radius + 5));
+        // Per ogni posizione nella nostra mappa
+        for (int mapX = 0; mapX < mapSize; mapX++) {
+            for (int mapZ = 0; mapZ < mapSize; mapZ++) {
+                // Se questa posizione fa parte della pozza
+                if (pitShape[mapX][mapZ]) {
+                    // Calcola le coordinate effettive
+                    int worldX = origin.getX() + (mapX - (radius + 5));
+                    int worldZ = origin.getZ() + (mapZ - (radius + 5));
+                    
+                    // Ottieni la profondità in questa posizione
+                    int localDepth = depthMap[mapX][mapZ];
+                    
+                    // Verifica che l'altezza del terreno in questa posizione sia esattamente uguale a pitLevel
+                    // Questo impedisce che la pozza si estenda su diversi livelli di altezza
+                    int localSurfaceY = findSurfaceY(level, new BlockPos(worldX, 0, worldZ));
+                    if (localSurfaceY != pitLevel) {
+                        // Se l'altezza è diversa, saltiamo questa posizione
+                        continue;
+                    }
+                    
+                    // Ora piazziamo tutti i blocchi di sabbie mobili in una volta sola, dall'alto verso il basso
+                    for (int depth = 0; depth < localDepth; depth++) {
+                        int worldY = pitLevel - depth;
+                        BlockPos pos = new BlockPos(worldX, worldY, worldZ);
                         
-                        // Get the depth at this position
-                        int localDepth = depthMap[mapX][mapZ];
+                        // Piazza il blocco di sabbie mobili
+                        level.setBlock(pos, pitBlockState, 3);
+                        placed = true;
                         
-                        // Only place blocks if we're within the depth range for this position
-                        if (layer < localDepth) {
-                            // Calculate the Y position for this layer
-                            int worldY = pitLevel - layer;
-                            
-                            // Create the block position
-                            BlockPos layerPos = new BlockPos(worldX, worldY, worldZ);
-                            
-                            // Check if there's solid ground below the bottom layer
-                            if (layer == localDepth - 1) {
-                                BlockPos belowPos = layerPos.below();
-                                BlockState belowLayerState = level.getBlockState(belowPos);
-                                
-                                // Only place quicksand if there's solid ground below
-                                if (belowLayerState.isAir() || !belowLayerState.isSolid()) {
-                                    continue; // Skip this position if there's no solid ground below
-                                }
-                            }
-                            
-                            // Verifica se il blocco è esposto lateralmente (solo per i blocchi che non sono in superficie)
-                            if (layer > 0) {
-                                boolean isExposed = false;
-                                
-                                // Controlla i blocchi adiacenti per vedere se sono esposti all'aria
-                                for (int dx = -1; dx <= 1; dx += 2) { // Solo -1 e 1
-                                    BlockPos adjacentPos = new BlockPos(worldX + dx, worldY, worldZ);
-                                    BlockState adjacentState = level.getBlockState(adjacentPos);
-                                    if (adjacentState.isAir()) {
-                                        isExposed = true;
-                                        break;
-                                    }
-                                }
-                                
-                                if (!isExposed) {
-                                    for (int dz = -1; dz <= 1; dz += 2) { // Solo -1 e 1
-                                        BlockPos adjacentPos = new BlockPos(worldX, worldY, worldZ + dz);
-                                        BlockState adjacentState = level.getBlockState(adjacentPos);
-                                        if (adjacentState.isAir()) {
-                                            isExposed = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                // Se il blocco è esposto lateralmente, non lo piazziamo
-                                if (isExposed) {
-                                    continue;
-                                }
-                            }
-                            
-                            // Check if the current block is in the list of replaceable blocks
-                            BlockState currentState = level.getBlockState(layerPos);
-                            Block currentBlock = currentState.getBlock();
-                            
-                            // Only replace blocks that are in the replaceable list
-                            if (config.replaceableBlocks.contains(currentBlock)) {
-                                // Place the quicksand block
-                                level.setBlock(layerPos, pitBlockState, 3);
-                                placed = true;
-                            }
+                        // Debug
+                        if (depth == 0) {
+                            System.out.println("[QuicksandPit] Placed surface quicksand at [" + worldX + ", " + worldY + ", " + worldZ + "]");
+                        } else {
+                            System.out.println("[QuicksandPit] Placed depth " + depth + " quicksand at [" + worldX + ", " + worldY + ", " + worldZ + "]");
                         }
                     }
                 }
             }
         }
         
-        // Third pass: Add a smoother transition at the edges (layer by layer approach)
-        System.out.println("[QuicksandPit] Adding edge transitions");
+        // Aggiungiamo le transizioni ai bordi in un unico passaggio
+        System.out.println("[QuicksandPit] Adding edge transitions in a single pass");
         
         // Create a map for the edge blocks
         boolean[][] edgeMap = new boolean[mapSize][mapSize];
@@ -321,87 +297,45 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
             }
         }
         
-        // Now place the edge blocks layer by layer
-        for (int layer = 0; layer < 3; layer++) { // Maximum edge depth is 2, but check layer 0 too
-            // For each position in our edge map
-            for (int mapX = 0; mapX < mapSize; mapX++) {
-                for (int mapZ = 0; mapZ < mapSize; mapZ++) {
-                    // If this position is an edge block
-                    if (edgeMap[mapX][mapZ]) {
-                        // Get the depth at this position
-                        int edgeDepth = edgeDepthMap[mapX][mapZ];
+        // Piazziamo i blocchi di bordo in un unico passaggio
+        for (int mapX = 0; mapX < mapSize; mapX++) {
+            for (int mapZ = 0; mapZ < mapSize; mapZ++) {
+                // Se questa posizione è un blocco di bordo
+                if (edgeMap[mapX][mapZ]) {
+                    // Ottieni la profondità in questa posizione
+                    int edgeDepth = edgeDepthMap[mapX][mapZ];
+                    
+                    // Calcola le coordinate effettive
+                    int worldX = origin.getX() + (mapX - (radius + 5));
+                    int worldZ = origin.getZ() + (mapZ - (radius + 5));
+                    
+                    // Verifica che l'altezza del terreno in questa posizione sia esattamente uguale a pitLevel
+                    int localSurfaceY = findSurfaceY(level, new BlockPos(worldX, 0, worldZ));
+                    if (localSurfaceY != pitLevel) {
+                        // Se l'altezza è diversa, saltiamo questa posizione
+                        continue;
+                    }
+                    
+                    // Piazza tutti i blocchi di bordo in una volta sola
+                    for (int depth = 0; depth <= edgeDepth; depth++) {
+                        int worldY = pitLevel - depth;
+                        BlockPos edgePos = new BlockPos(worldX, worldY, worldZ);
                         
-                        // Only place blocks if we're within the depth range for this position
-                        if (layer <= edgeDepth) {
-                            // Calculate the actual world coordinates
-                            int worldX = origin.getX() + (mapX - (radius + 5));
-                            int worldZ = origin.getZ() + (mapZ - (radius + 5));
-                            int worldY = pitLevel - layer;
-                            
-                            // Create the block position
-                            BlockPos edgePos = new BlockPos(worldX, worldY, worldZ);
-                            
-                            // Check if there's solid ground below the bottom layer
-                            if (layer == edgeDepth) {
-                                BlockPos belowPos = edgePos.below();
-                                BlockState belowEdgeState = level.getBlockState(belowPos);
-                                
-                                // Only place quicksand if there's solid ground below
-                                if (belowEdgeState.isAir() || !belowEdgeState.isSolid()) {
-                                    continue; // Skip this position if there's no solid ground below
-                                }
-                            }
-                            
-                            // Verifica se il blocco è esposto lateralmente (solo per i blocchi che non sono in superficie)
-                            if (layer > 0) {
-                                boolean isExposed = false;
-                                
-                                // Controlla i blocchi adiacenti per vedere se sono esposti all'aria
-                                for (int dx = -1; dx <= 1; dx += 2) { // Solo -1 e 1
-                                    BlockPos adjacentPos = new BlockPos(worldX + dx, worldY, worldZ);
-                                    BlockState adjacentState = level.getBlockState(adjacentPos);
-                                    if (adjacentState.isAir()) {
-                                        isExposed = true;
-                                        break;
-                                    }
-                                }
-                                
-                                if (!isExposed) {
-                                    for (int dz = -1; dz <= 1; dz += 2) { // Solo -1 e 1
-                                        BlockPos adjacentPos = new BlockPos(worldX, worldY, worldZ + dz);
-                                        BlockState adjacentState = level.getBlockState(adjacentPos);
-                                        if (adjacentState.isAir()) {
-                                            isExposed = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                // Se il blocco è esposto lateralmente, non lo piazziamo
-                                if (isExposed) {
-                                    continue;
-                                }
-                            }
-                            
-                            // Check if the current block is in the list of replaceable blocks
-                            BlockState currentState = level.getBlockState(edgePos);
-                            Block currentBlock = currentState.getBlock();
-                            
-                            // Only replace blocks that are in the replaceable list
-                            if (config.replaceableBlocks.contains(currentBlock)) {
-                                // Place the quicksand block
-                                level.setBlock(edgePos, pitBlockState, 3);
-                                placed = true;
-                            }
-                        }
+                        // Piazza il blocco di sabbie mobili
+                        level.setBlock(edgePos, pitBlockState, 3);
+                        placed = true;
+                        
+                        // Debug
+                        System.out.println("[QuicksandPit] Placed edge quicksand at depth " + depth + 
+                                           " at [" + worldX + ", " + worldY + ", " + worldZ + "]");
                     }
                 }
             }
         }
         
-        // Fourth pass: Add a border around the quicksand pit if enabled in configuration
+        // Aggiungiamo un bordo attorno alla pozza di sabbie mobili se abilitato nella configurazione
         if (config.hasBorder) {
-            System.out.println("[QuicksandPit] Adding border");
+            System.out.println("[QuicksandPit] Adding complete border around the quicksand pit");
             
             // Determine which block to use for the border
             BlockState borderBlockState;
@@ -413,141 +347,60 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
                 borderBlockState = pitBlockState;
             }
             
-            // Create a map for the border blocks
-            boolean[][] borderMap = new boolean[mapSize][mapSize];
-            boolean[][] secondLayerMap = new boolean[mapSize][mapSize];
-            
-            // First determine which blocks are border blocks
-            for (int x = -radius - 4; x <= radius + 4; x++) {
-                for (int z = -radius - 4; z <= radius + 4; z++) {
-                    // Calculate distance from center
-                    double distance = Math.sqrt(x * x + z * z) / radius;
-                    
-                    // Work only on the border area (just outside the pit)
-                    if (distance >= 1.1 && distance < 1.3) {
-                        // Get noise value for this position to create a natural-looking border
-                        double noiseValue = getNoise(x, z, horizontalNoise, radius);
-                        
-                        // Determine if this is a border block
-                        boolean isBorderBlock = noiseValue < 0.6 && random.nextFloat() < 0.7;
-                        
-                        // Store in our border map
-                        int mapX = x + radius + 5;
-                        int mapZ = z + radius + 5;
-                        
-                        if (mapX >= 0 && mapX < mapSize && mapZ >= 0 && mapZ < mapSize) {
-                            borderMap[mapX][mapZ] = isBorderBlock;
-                            
-                            // Sometimes add a second layer for a more natural look
-                            if (isBorderBlock && random.nextFloat() < 0.3) {
-                                secondLayerMap[mapX][mapZ] = true;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Now place the border blocks layer by layer
-            // First layer (at pit level)
+            // Nuovo approccio: creiamo un bordo completo attorno alla pozza
+            // Iteriamo su tutti i blocchi della pozza e controlliamo i loro vicini
             for (int mapX = 0; mapX < mapSize; mapX++) {
                 for (int mapZ = 0; mapZ < mapSize; mapZ++) {
-                    // If this position is a border block
-                    if (borderMap[mapX][mapZ]) {
-                        // Calculate the actual world coordinates
-                        int worldX = origin.getX() + (mapX - (radius + 5));
-                        int worldZ = origin.getZ() + (mapZ - (radius + 5));
-                        
-                        // Create the block position at pit level
-                        BlockPos borderPos = new BlockPos(worldX, pitLevel, worldZ);
-                        BlockState currentState = level.getBlockState(borderPos);
-                        
-                        // Only place border blocks on solid ground and if the block is in the replaceable list
-                        if (!currentState.isAir() && currentState.isSolid() && config.replaceableBlocks.contains(currentState.getBlock())) {
-                            // Place the border block
-                            level.setBlock(borderPos, borderBlockState, 3);
-                            placed = true;
-                        }
-                    }
-                }
-            }
-            
-            // Second layer (at the same level for some blocks)
-            for (int mapX = 0; mapX < mapSize; mapX++) {
-                for (int mapZ = 0; mapZ < mapSize; mapZ++) {
-                    // If this position should have a second layer
-                    if (secondLayerMap[mapX][mapZ]) {
-                        // Calculate the actual world coordinates
-                        int worldX = origin.getX() + (mapX - (radius + 5));
-                        int worldZ = origin.getZ() + (mapZ - (radius + 5));
-                        
-                        // Create the block position at the same level as the pit (not above)
-                        // This prevents blocks from appearing above the surface
-                        BlockPos samePos = new BlockPos(worldX, pitLevel, worldZ);
-                        BlockState sameState = level.getBlockState(samePos);
-                        
-                        // Only place if the current position is air or can be replaced
-                        // and there's solid ground below
-                        BlockState belowSameState = level.getBlockState(samePos.below());
-                        if ((sameState.isAir() || (sameState.canBeReplaced() && config.replaceableBlocks.contains(sameState.getBlock()))) 
-                            && belowSameState.isSolid()) {
-                            level.setBlock(samePos, borderBlockState, 3);
-                        }
-                    }
-                }
-            }
-            
-            // Aggiungi blocchi di bordo anche sotto la superficie per evitare che i lati siano visibili
-            for (int layer = 1; layer < 3; layer++) { // Aggiungi fino a 2 strati sotto la superficie
-                for (int mapX = 0; mapX < mapSize; mapX++) {
-                    for (int mapZ = 0; mapZ < mapSize; mapZ++) {
-                        // Se questa posizione è un blocco di bordo
-                        if (borderMap[mapX][mapZ]) {
-                            // Calcola le coordinate effettive
-                            int worldX = origin.getX() + (mapX - (radius + 5));
-                            int worldZ = origin.getZ() + (mapZ - (radius + 5));
-                            int worldY = pitLevel - layer;
-                            
-                            // Crea la posizione del blocco
-                            BlockPos borderPos = new BlockPos(worldX, worldY, worldZ);
-                            
-                            // Verifica se il blocco è esposto lateralmente
-                            boolean isExposed = false;
-                            
-                            // Controlla i blocchi adiacenti per vedere se sono esposti all'aria
-                            for (int dx = -1; dx <= 1; dx += 2) { // Solo -1 e 1
-                                BlockPos adjacentPos = new BlockPos(worldX + dx, worldY, worldZ);
-                                BlockState adjacentState = level.getBlockState(adjacentPos);
-                                if (adjacentState.isAir()) {
-                                    isExposed = true;
-                                    break;
-                                }
-                            }
-                            
-                            if (!isExposed) {
-                                for (int dz = -1; dz <= 1; dz += 2) { // Solo -1 e 1
-                                    BlockPos adjacentPos = new BlockPos(worldX, worldY, worldZ + dz);
-                                    BlockState adjacentState = level.getBlockState(adjacentPos);
-                                    if (adjacentState.isAir()) {
-                                        isExposed = true;
-                                        break;
+                    // Se questa posizione è un blocco della pozza
+                    if (pitShape[mapX][mapZ]) {
+                        // Controlliamo tutti i blocchi adiacenti (8 direzioni)
+                        for (int dx = -1; dx <= 1; dx++) {
+                            for (int dz = -1; dz <= 1; dz++) {
+                                // Saltiamo il blocco centrale (la pozza stessa)
+                                if (dx == 0 && dz == 0) continue;
+                                
+                                int neighborX = mapX + dx;
+                                int neighborZ = mapZ + dz;
+                                
+                                // Verifichiamo che il vicino sia all'interno della mappa
+                                if (neighborX >= 0 && neighborX < mapSize && neighborZ >= 0 && neighborZ < mapSize) {
+                                    // Se il vicino NON è parte della pozza, è un potenziale blocco di bordo
+                                    if (!pitShape[neighborX][neighborZ]) {
+                                        // Calcola le coordinate effettive nel mondo
+                                        int worldX = origin.getX() + (neighborX - (radius + 5));
+                                        int worldZ = origin.getZ() + (neighborZ - (radius + 5));
+                                        
+                                        // Troviamo l'altezza della superficie in questa posizione
+                                        int localSurfaceY = findSurfaceY(level, new BlockPos(worldX, 0, worldZ));
+                                        
+                                        // Se non abbiamo trovato una superficie valida, saltiamo
+                                        if (localSurfaceY == -1) continue;
+                                        
+                                        // Verifichiamo che l'altezza sia ragionevolmente vicina alla pozza
+                                        if (Math.abs(localSurfaceY - pitLevel) > 2) continue;
+                                        
+                                        // Determiniamo la profondità del bordo in base alla distanza dal centro
+                                        int borderDepth = 3; // Profondità predefinita
+                                        
+                                        // Piazziamo i blocchi di bordo dalla superficie fino alla profondità specificata
+                                        for (int depth = 0; depth <= borderDepth; depth++) {
+                                            int worldY = localSurfaceY - depth;
+                                            BlockPos borderPos = new BlockPos(worldX, worldY, worldZ);
+                                            
+                                            // Verifichiamo che il blocco sia sostituibile
+                                            BlockState existingState = level.getBlockState(borderPos);
+                                            if (isReplaceable(existingState, config.replaceableBlocks)) {
+                                                // Piazza il blocco di bordo
+                                                level.setBlock(borderPos, borderBlockState, 3);
+                                                placed = true;
+                                                
+                                                // Debug
+                                                System.out.println("[QuicksandPit] Placed border block at depth " + depth + 
+                                                                   " at [" + worldX + ", " + worldY + ", " + worldZ + "]");
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                            
-                            // Se il blocco è esposto lateralmente, non lo piazziamo
-                            if (isExposed) {
-                                continue;
-                            }
-                            
-                            // Verifica se il blocco corrente è nella lista dei blocchi sostituibili
-                            BlockState currentState = level.getBlockState(borderPos);
-                            Block currentBlock = currentState.getBlock();
-                            
-                            // Sostituisci solo i blocchi che sono nella lista dei sostituibili
-                            if (config.replaceableBlocks.contains(currentBlock)) {
-                                // Piazza il blocco di bordo
-                                level.setBlock(borderPos, borderBlockState, 3);
-                                placed = true;
                             }
                         }
                     }
@@ -559,7 +412,58 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
     }
     
     /**
-     * Verifica se l'area è circondata da sabbia
+     * Verifica se l'area è circondata dai blocchi specificati nel file JSON
+     * @return true se l'area è circondata dai blocchi specificati
+     */
+    private boolean isAreaSurroundedByReplaceableBlocks(WorldGenLevel level, BlockPos origin, int radius, int surfaceY, List<Block> replaceableBlocks) {
+        // Controlla il perimetro esterno
+        int checkRadius = radius + 2; // Controlla un po' più all'esterno
+        int validBlockCount = 0;
+        int totalChecks = 0;
+        
+        System.out.println("[QuicksandPit] Checking if area is surrounded by replaceable blocks: " + replaceableBlocks);
+        
+        for (int x = -checkRadius; x <= checkRadius; x++) {
+            for (int z = -checkRadius; z <= checkRadius; z++) {
+                // Controlla solo il perimetro
+                if (Math.abs(x) == checkRadius || Math.abs(z) == checkRadius) {
+                    BlockPos checkPos = new BlockPos(origin.getX() + x, surfaceY, origin.getZ() + z);
+                    BlockState state = level.getBlockState(checkPos);
+                    totalChecks++;
+                    
+                    // Verifica se il blocco è nella lista dei blocchi sostituibili
+                    boolean isValidBlock = false;
+                    for (Block block : replaceableBlocks) {
+                        if (state.is(block)) {
+                            isValidBlock = true;
+                            break;
+                        }
+                    }
+                    
+                    if (isValidBlock) {
+                        validBlockCount++;
+                    }
+                }
+            }
+        }
+        
+        // Richiedi che almeno il 70% del perimetro sia composto dai blocchi specificati
+        float validBlockPercentage = (float) validBlockCount / totalChecks;
+        boolean result = validBlockPercentage >= 0.7f;
+        
+        if (!result) {
+            System.out.println("[QuicksandPit] Valid block percentage too low: " + (validBlockPercentage * 100) + 
+                               "% (need 70%). Found " + validBlockCount + " valid blocks out of " + totalChecks);
+        } else {
+            System.out.println("[QuicksandPit] Area is surrounded by replaceable blocks: " + 
+                               (validBlockPercentage * 100) + "% valid blocks");
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Verifica se l'area è circondata da sabbia (metodo legacy)
      * @return true se l'area è circondata da sabbia
      */
     private boolean isSurroundedBySand(WorldGenLevel level, BlockPos origin, int radius, int surfaceY) {
@@ -664,36 +568,43 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
     
     /**
      * Finds the Y coordinate of the surface at the given x,z position
-     * Ensures we find a solid surface with solid blocks below it
+     * Simplified version that uses the world heightmap
      */
     private int findSurfaceY(WorldGenLevel level, BlockPos pos) {
-        // Start from a high position and move down until we find a solid block
-        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos(pos.getX(), 
-                level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, pos.getX(), pos.getZ()), 
-                pos.getZ());
+        // Use the world heightmap to find the surface
+        int surfaceY = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
         
-        // Find the highest non-air block
-        while (mutablePos.getY() > level.getMinBuildHeight()) {
-            BlockState state = level.getBlockState(mutablePos);
-            if (!state.isAir()) {
-                // Check if there's solid ground below this block
-                BlockPos belowPos = mutablePos.below();
-                BlockState belowSurfaceState = level.getBlockState(belowPos);
-                
-                // Make sure there's at least one solid block below
-                if (!belowSurfaceState.isAir() && belowSurfaceState.isSolid()) {
-                    return mutablePos.getY();
-                }
-            }
-            mutablePos.move(0, -1, 0);
+        // Verify that there's a solid block at this position
+        BlockPos surfacePos = new BlockPos(pos.getX(), surfaceY, pos.getZ());
+        BlockState state = level.getBlockState(surfacePos);
+        
+        if (!state.isAir() && state.isSolid()) {
+            return surfaceY;
         }
         
+        // If the surface block isn't solid, try to find a solid block below
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos(surfacePos.getX(), surfacePos.getY(), surfacePos.getZ());
+        
+        // Look for a solid block up to 5 blocks below the surface
+        for (int y = 0; y < 5; y++) {
+            mutablePos.move(0, -1, 0);
+            state = level.getBlockState(mutablePos);
+            
+            if (!state.isAir() && state.isSolid()) {
+                return mutablePos.getY();
+            }
+        }
+        
+        // No solid surface found
         return -1;
     }
     
+
+    
     /**
      * Verifica se l'area è sufficientemente pianeggiante per generare la fossa
-     * @return true se l'area è pianeggiante
+     * Questo metodo è più semplice e permette piccole variazioni di altezza
+     * @return true se l'area è sufficientemente pianeggiante
      */
     private boolean isAreaFlat(WorldGenLevel level, BlockPos origin, int radius, int centerY) {
         int checkRadius = radius + 2; // Controlla un po' più all'esterno
@@ -701,16 +612,30 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
         
         for (int x = -checkRadius; x <= checkRadius; x += 2) { // Campiona ogni 2 blocchi per efficienza
             for (int z = -checkRadius; z <= checkRadius; z += 2) {
-                BlockPos checkPos = new BlockPos(origin.getX() + x, 0, origin.getZ() + z);
-                int surfaceY = findSurfaceY(level, checkPos);
+                // Calcola la distanza dal centro
+                double distance = Math.sqrt(x*x + z*z);
                 
-                if (surfaceY == -1) {
-                    return false; // Non è stato possibile trovare una superficie valida
-                }
-                
-                // Verifica che la differenza di altezza non sia troppo grande
-                if (Math.abs(surfaceY - centerY) > maxHeightDifference) {
-                    return false;
+                // Controlla solo i punti all'interno del raggio o leggermente oltre
+                if (distance <= checkRadius) {
+                    BlockPos checkPos = new BlockPos(origin.getX() + x, 0, origin.getZ() + z);
+                    int surfaceY = findSurfaceY(level, checkPos);
+                    
+                    if (surfaceY == -1) {
+                        return false; // Non è stato possibile trovare una superficie valida
+                    }
+                    
+                    // Verifica che la differenza di altezza non sia troppo grande
+                    if (Math.abs(surfaceY - centerY) > maxHeightDifference) {
+                        return false;
+                    }
+                    
+                    // Verifichiamo che il blocco sia solido
+                    BlockPos surfacePos = new BlockPos(origin.getX() + x, surfaceY, origin.getZ() + z);
+                    BlockState surfaceState = level.getBlockState(surfacePos);
+                    
+                    if (!surfaceState.isSolid()) {
+                        return false; // Non è un blocco solido
+                    }
                 }
             }
         }
@@ -759,5 +684,28 @@ public class QuicksandPitFeature extends Feature<QuicksandPitConfiguration> {
         if (!belowDepressionState.isAir() && belowDepressionState.isSolid()) {
             level.setBlock(mutablePos, Blocks.SAND.defaultBlockState(), 3);
         }
+    }
+    
+    /**
+     * Verifica se un blocco può essere sostituito in base alla lista di blocchi sostituibili
+     * @param state Lo stato del blocco da verificare
+     * @param replaceableBlocks La lista di blocchi sostituibili
+     * @return true se il blocco può essere sostituito
+     */
+    private boolean isReplaceable(BlockState state, List<Block> replaceableBlocks) {
+        // Se il blocco è aria, può essere sostituito
+        if (state.isAir()) {
+            return true;
+        }
+        
+        // Se il blocco è nella lista dei blocchi sostituibili, può essere sostituito
+        for (Block block : replaceableBlocks) {
+            if (state.is(block)) {
+                return true;
+            }
+        }
+        
+        // Altrimenti, non può essere sostituito
+        return false;
     }
 }

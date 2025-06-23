@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.CountPlacement;
 import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
@@ -20,21 +21,24 @@ import net.mokai.quicksandrehydrated.worldgen.placement.QuicksandPitPlacement;
 import java.util.List;
 
 public class ModPlacedFeatures {
-    public static final ResourceKey<PlacedFeature> QUICKSAND_PIT_PLACED_KEY = createKey("quicksand_pit_placed");
+    // Cambiamo la chiave per corrispondere al file JSON
+    public static final ResourceKey<PlacedFeature> QUICKSAND_PIT_PLACED_KEY = createKey("quicksand_pit");
 
     public static void bootstrap(BootstapContext<PlacedFeature> context) {
         HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 
-        // Register the placed quicksand pit feature with our custom placement logic
-        // This will spawn the quicksand pit in appropriate locations based on terrain analysis
+        // Registriamo la feature con le stesse impostazioni del file JSON
         register(context, QUICKSAND_PIT_PLACED_KEY, 
                 configuredFeatures.getOrThrow(ModConfiguredFeatures.QUICKSAND_PIT_KEY),
-                RarityFilter.onAverageOnceEvery(16), // Aumentiamo la frequenza base perché il nostro filtro è più selettivo
-                InSquarePlacement.spread(), // Spreads the feature within the chunk
-                PlacementUtils.HEIGHTMAP, // Places on the heightmap
-                QuicksandPitPlacement.INSTANCE, // Il nostro placement modifier personalizzato che analizza il terreno
-                BiomeFilter.biome() // Filters by biome (will be specified in biome modification)
+                RarityFilter.onAverageOnceEvery(2), // Chance: 2 come nel JSON
+                InSquarePlacement.spread(), // Corrisponde a "in_square" nel JSON
+                PlacementUtils.HEIGHTMAP, // Corrisponde a "heightmap" nel JSON
+                QuicksandPitPlacement.INSTANCE, // Il nostro placement modifier personalizzato
+                BiomeFilter.biome(), // Corrisponde a "biome" nel JSON
+                CountPlacement.of(3) // Media tra min (2) e max (5) nel JSON
         );
+        
+        System.out.println("[ModPlacedFeatures] Registrata feature quicksand_pit con chiave: " + QUICKSAND_PIT_PLACED_KEY);
     }
 
     private static ResourceKey<PlacedFeature> createKey(String name) {
