@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -76,7 +77,38 @@ public class QuicksandBase extends Block implements QuicksandInterface {
      * @param depth The depth in blocks. <code>0</code> is exactly on surface level.
      * @return The sinking value. Lower value means slower sinking.
      */
-    public double getSinkSpeed(double depth) {return QSBehavior.getSinkSpeed(depth);}
+    public double getSinkSpeed(double depth) {
+        // Get the configured buoyancy point
+        double buoyancyPoint = QSBehavior.getBuoyancyPoint();
+        
+        // Calculate how much we're beyond the buoyancy point (if at all)
+        double beyondBuoyancy = depth - buoyancyPoint;
+        
+        if (beyondBuoyancy > 0) {
+            // We're beyond the buoyancy point
+            // Use a smooth curve to gradually reduce sink speed as we go deeper
+            
+            // This formula creates a gentle curve that approaches zero as depth increases
+            // but never quite reaches zero to ensure some minimal movement
+            double reductionFactor = 0.05 + 0.15 * Math.exp(-beyondBuoyancy * 3);
+            
+            return QSBehavior.getSinkSpeed(depth) * reductionFactor;
+        }
+        else {
+            // We're at or above the buoyancy point
+            double baseSinkSpeed = QSBehavior.getSinkSpeed(depth);
+            
+            // Use a smooth curve to gradually reduce sink speed as we approach buoyancy
+            // The closer we get to buoyancy, the more we reduce the sink speed
+            double distanceFromBuoyancy = Math.abs(beyondBuoyancy);
+            
+            // This creates a curve that starts at 20% at buoyancy and smoothly increases to 100%
+            // as we move away from buoyancy
+            double speedFactor = 0.2 + 0.8 * Math.tanh(distanceFromBuoyancy * 3);
+            
+            return baseSinkSpeed * speedFactor;
+        }
+    }
 
     /**
      * Horizontal movement speed depending on the depth.
@@ -201,9 +233,44 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 //            if (vert != 0.0) {
 //                sink = sink / vert; // counteract vertical thickness (?)
 //            }
-            Vec3 addVec = new Vec3(0, -sink, 0);
-            entQS.addQuicksandAdditive(addVec);
-
+            
+            // Check if we are close to the buoyancy point
+            double buoyancyPoint = QSBehavior.getBuoyancyPoint();
+            double distanceToBuoyancy = buoyancyPoint - depth;
+            
+            // Calculate how much we're beyond the buoyancy point (if at all)
+            double beyondBuoyancy = depth - buoyancyPoint;
+            
+            if (beyondBuoyancy > 0) {
+                // We're beyond the buoyancy point - apply resurfing that scales with depth
+                
+                // Calculate resurfing force with a smooth curve
+                // This creates a gradual increase from 0 at buoyancy point
+                // The square function makes it very gentle near buoyancy
+                double resurfingForce = QSBehavior.getResurfingForce() * Math.pow(beyondBuoyancy, 1.5) * 2.0;
+                
+                // Apply a minimum force when very close to buoyancy to ensure some movement
+                if (beyondBuoyancy < 0.05) {
+                    resurfingForce = Math.max(resurfingForce, QSBehavior.getResurfingForce() * 0.01);
+                }
+                
+                Vec3 resurfingVec = new Vec3(0, resurfingForce, 0);
+                entQS.addQuicksandAdditive(resurfingVec);
+            } 
+            else {
+                // We're at or above the buoyancy point - apply sinking force
+                
+                // Calculate sinking force with a smooth curve
+                // This creates a gradual decrease as we approach buoyancy
+                double distanceFromBuoyancy = Math.abs(beyondBuoyancy);
+                double sinkFactor = Math.min(1.0, 0.2 + 0.8 * Math.tanh(distanceFromBuoyancy * 3));
+                
+                // Apply the scaled sinking force
+                double scaledSink = -sink * sinkFactor;
+                
+                Vec3 addVec = new Vec3(0, scaledSink, 0);
+                entQS.addQuicksandAdditive(addVec);
+            }
         }
 
         Vec3 thicknessVector = new Vec3(walk, vert, walk);
@@ -214,61 +281,68 @@ public class QuicksandBase extends Block implements QuicksandInterface {
     public void applyQuicksandEffects(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos,
             @NotNull Entity pEntity) {
 
-        // Ottimizzazione: Ignora le bolle per evitare calcoli inutili
+        // Optimization: Ignore bubbles to avoid unnecessary calculations
         if (pEntity instanceof EntityBubble) {
             return;
         }
 
-        // Calcola la profondità solo se necessario
+        // Calculate the depth only if necessary
         double depth = getDepth(pLevel, pPos, pEntity);
         
-        // Anche se la profondità è 0 o negativa, potremmo avere la parte superiore del corpo nella sabbia mobile
-        // Quindi non facciamo un return immediato, ma usiamo una profondità minima
+        // Even if the depth is 0 or negative, we might have the upper part of the body in the quicksand
+        // So we don't do an immediate return, but use a minimum depth
         if (depth <= 0) {
-            // Verifica se la parte superiore del corpo è nella sabbia mobile
+            // Check if the upper part of the body is in the quicksand
             double entityY = pEntity.getY();
             double entityHeight = pEntity.getBbHeight();
             double entityTop = entityY + entityHeight;
             
-            // Se la parte superiore del corpo è sopra il blocco, allora non c'è effetto
-            if (entityTop <= pPos.getY() || entityY >= pPos.getY() + 1.0) {
+            // Calculate the surface of the quicksand block with greater precision
+            double surfaceY = pPos.getY() + 1.0 - getOffset(pState);
+            
+            // If the upper part of the body is above the surface, then there is no effect
+            if (entityTop <= surfaceY || entityY >= surfaceY + 1.0) {
                 return;
             }
             
-            // Altrimenti, usa una profondità minima per applicare comunque gli effetti
-            depth = 0.1;
+            // Calculate the depth based on the portion of the body that is actually immersed
+            double immersedHeight = Math.max(0, entityTop - surfaceY);
+            depth = Math.max(0.05, immersedHeight / entityHeight * 0.2);
         }
 
-        // Applica la copertura solo per i giocatori
+        // Apply coverage only for players
         if (pEntity instanceof Player) {
             trySetCoverage(pEntity);
         }
 
-        // Applica gli effetti principali della sabbia mobile: spessore e affondamento
+        // Check if we are at the buoyancy point or beyond
+        double buoyancyPoint = QSBehavior.getBuoyancyPoint();
+        
+        // Apply the main effects of quicksand: thickness and sinking
         quicksandMomentum(pState, pLevel, pPos, pEntity, depth);
 
-        // Applica effetti speciali
+        // Apply special effects
         entityQuicksandVar qsE = (entityQuicksandVar) pEntity;
         
-        // Ottimizzazione: Verifica se ci sono effetti da applicare
+        // Optimization: Check if there are effects to apply
         if (!qsE.getQuicksandEffectManager().effects.isEmpty()) {
             for (QuicksandEffect e : qsE.getQuicksandEffectManager().effects) {
                 e.effectEntity(pPos, pEntity, getQuicksandBehavior());
             }
         }
 
-        // Gestione del movimento e dello stato "onGround"
+        // Movement management and "onGround" state
         if (!canStepOut(depth)) {
-            // Se l'entità non può uscire, imposta onGround a false
+            // If the entity cannot exit, set onGround to false
             pEntity.setOnGround(false);
         }
         
-        // Resetta sempre la distanza di caduta
+        // Always reset the fall distance
         pEntity.resetFallDistance();
     }
 
     public void trySetCoverage(Entity pEntity) {
-        // Set a section of coverage, bottom to the current depth value (as a percentage)
+        // Set a section of coverage at the surface level of the block
         // Now with optimization to avoid unnecessary updates
 
         if (pEntity instanceof Player) {
@@ -277,22 +351,57 @@ public class QuicksandBase extends Block implements QuicksandInterface {
             
             if (pC == null) return;
 
+            // Get the correct depth
             double depth = getDepth(pEntity.level(), pEntity.blockPosition(), pEntity);
-            double depth_percent = clamp(depth, 0.0, 2.0)/2.0;
-
-            // Assicuriamoci che il coverage inizi da 0 (il punto più basso dei piedi)
-            int begin = 0;
-            // Aggiungiamo +1 per assicurarci che il primo pixel sia sempre coperto
-            int end = (int) (32 * depth_percent) + 1;
-            end = clamp(end, 1, 32);
+            
+            // If the depth is too small, don't apply coverage
+            if (depth < 0.05) return;
+            
+            // Calculate the surface of the quicksand block with greater precision
+            BlockPos blockPos = pEntity.blockPosition();
+            BlockState blockState = pEntity.level().getBlockState(blockPos);
+            double offset = getOffset(blockState);
+            double surfaceY = blockPos.getY() + 1.0 - offset; // Block surface
+            
+            double entityY = pEntity.getY();
+            double entityHeight = pEntity.getBbHeight();
+            
+            // Calculate where the block surface intersects the player model (scale 0-32)
+            // 0 is the feet, 32 is the head
+            // We use a more precise formula that takes into account the actual height of the player
+            double surfacePoint = ((surfaceY - entityY) / entityHeight) * 32.0;
+            
+            // We calculate the surface point more precisely
+            // We no longer force a minimum value to allow precise alignment with the block surface
+            
+            // Limit to a valid range
+            int surfacePixel = (int) clamp(surfacePoint, 0, 32);
+            
+            // Surface-based approach:
+            // 1. Always start from the feet (0)
+            // 2. End exactly at the surface
+            int begin = 0; // Always start from the feet
+            int end = surfacePixel; // End exactly at the surface
+            
+            // We no longer add a margin above the surface
+            // to perfectly align the coverage with the block surface
+            
+            // If the player is completely submerged, cover the entire body
+            if (depth >= entityHeight) {
+                end = 32; // Up to the head
+            }
+            
+            // Make sure the range is valid
+            begin = clamp(begin, 0, 31);
+            end = clamp(end, begin + 1, 32);
 
             // Check if we already have an entry with the same values to avoid unnecessary updates
             ResourceLocation tex = new ResourceLocation(QuicksandRehydrated.MOD_ID, QSBehavior.getCoverageTex());
             
-            // Check if we need to update
+            // Check if an update is needed
             boolean needsUpdate = true;
             
-            // Look for an existing entry with the same texture and similar range
+            // Look for an existing entry with the same texture and a similar range
             for (CoverageEntry entry : pC.coverageEntries) {
                 if (entry.texture.equals(tex) && entry.begin == begin && Math.abs(entry.end - end) <= 1) {
                     // We already have a very similar entry, no need to update
@@ -316,7 +425,7 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
         qEM.clear();
 
-        // Rimuovi i log di sistema per migliorare le prestazioni
+        // Remove system logs to improve performance
         for (Class<? extends QuicksandEffect> e : qb.effectsList) {
             qEM.addEffect(e, pPos, pEntity);
         }
@@ -374,6 +483,35 @@ public class QuicksandBase extends Block implements QuicksandInterface {
 
     // special function for sinkables that runs when an entity jumps on, or in it.
     public void sinkableJumpOff(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
+        // Calculate the entity's depth
+        double depth = getDepth(pLevel, pPos, pEntity);
+        double buoyancyPoint = getBuoyancyPoint();
+        
+        // If the entity is below the buoyancy point, apply a stronger upward thrust
+        if (depth >= buoyancyPoint && pEntity instanceof LivingEntity) {
+            // Apply a strong upward thrust
+            double jumpForce = 0.15 * (depth - buoyancyPoint + 0.2);
+            pEntity.setDeltaMovement(pEntity.getDeltaMovement().add(0, jumpForce, 0));
+            
+            // Add a sound effect for the jump
+            pLevel.playSound(null, pEntity.blockPosition(), 
+                    net.minecraft.sounds.SoundEvents.BUBBLE_COLUMN_UPWARDS_INSIDE, 
+                    net.minecraft.sounds.SoundSource.BLOCKS, 
+                    0.8F, 0.8F + pLevel.getRandom().nextFloat() * 0.4F);
+            
+            // Add bubble particles
+            for (int i = 0; i < 10; i++) {
+                double offsetX = pLevel.getRandom().nextDouble() * 0.6 - 0.3;
+                double offsetZ = pLevel.getRandom().nextDouble() * 0.6 - 0.3;
+                pLevel.addParticle(
+                    net.minecraft.core.particles.ParticleTypes.BUBBLE, 
+                    pEntity.getX() + offsetX, 
+                    pEntity.getY() + 0.1, 
+                    pEntity.getZ() + offsetZ, 
+                    0, 0.1, 0
+                );
+            }
+        }
     }
 
     @Override
@@ -400,7 +538,41 @@ public class QuicksandBase extends Block implements QuicksandInterface {
             // Applica l'affondamento solo se l'entità è sopra la sabbia mobile
             if (isAboveBlock) {
                 // Ottimizzazione: Calcola la velocità di affondamento una sola volta
-                double sinkSpeed = 0.05 * depth;
+                // Riduciamo leggermente la velocità di affondamento per un effetto più realistico
+                double sinkSpeed = 0.04 * depth;
+                
+                // Controlla se l'entità ha raggiunto il punto di buoyancy
+                double buoyancyPoint = getBuoyancyPoint();
+                
+                // Se la profondità è maggiore o uguale al punto di buoyancy, imposta la velocità di affondamento a 0
+                if (depth >= buoyancyPoint) {
+                    sinkSpeed = 0.0;
+                    
+                    // Se l'entità è un giocatore e sta cercando di muoversi verso l'alto, applica una forza di risalita
+                    if (pEntity instanceof Player) {
+                        // Check if player has upward momentum (jumping)
+                        if (pEntity.getDeltaMovement().y > 0) {
+                        // Applica una forza di risalita quando si preme il tasto di salto
+                        double resurfingForce = QSBehavior.getResurfingForce();
+                        pEntity.setDeltaMovement(pEntity.getDeltaMovement().add(0, resurfingForce, 0));
+                        
+                        // Aggiungi un effetto sonoro per il resurfing (ogni mezzo secondo)
+                        if (pLevel.getGameTime() % 10 == 0) {
+                            pLevel.playSound(null, pEntity.blockPosition(), 
+                                    net.minecraft.sounds.SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, 
+                                    net.minecraft.sounds.SoundSource.BLOCKS, 
+                                    0.4F, 0.8F + pLevel.getRandom().nextFloat() * 0.4F);
+                        }
+                        }
+                    }
+                }
+                // Se siamo vicini al punto di buoyancy (entro 0.3 blocchi), riduci gradualmente la velocità
+                else if (buoyancyPoint - depth < 0.3) {
+                    // Riduci linearmente la velocità di affondamento man mano che ci avviciniamo al punto di buoyancy
+                    double reductionFactor = (buoyancyPoint - depth) / 0.3;
+                    sinkSpeed *= reductionFactor;
+                }
+                
                 // Applica solo se la velocità è significativa
                 if (sinkSpeed > 0.001) {
                     pEntity.setDeltaMovement(pEntity.getDeltaMovement().add(0, -sinkSpeed, 0));
