@@ -37,9 +37,10 @@ public class QuicksandBehavior {
     public String coverageTexture = "quicksand_coverage";
     public String secretDeathMessage = "quicksand";
     public double secretDeathMessageChance = 0;
-    public double buoyancyPoint = 2d;
+    public double buoyancyPoint = net.mokai.quicksandrehydrated.util.BodyDepthThreshold.KNEE.depth; // Altezza del ginocchio (ridotto ulteriormente)
     public double offset = 0;
-    public double stepOutHeight = .1d;
+    public double stepOutHeight = net.mokai.quicksandrehydrated.util.BodyDepthThreshold.FEET.depth;
+    public double resurfingForce = 0.03; // Default resurfing force
 
 
     public QuicksandBehavior addQuicksandEffect(Class<? extends QuicksandEffect> effectClass) {
@@ -133,4 +134,7 @@ public class QuicksandBehavior {
     public QuicksandBehavior setStepOutHeight(double point) {stepOutHeight = point; return this;}
     public double            getStepOutHeight() {return stepOutHeight;}
     public boolean           canStepOut(double height) {return height>=stepOutHeight;}
+    
+    public QuicksandBehavior setResurfingForce(double force) {resurfingForce = force; return this;}
+    public double            getResurfingForce() {return resurfingForce;}
 }

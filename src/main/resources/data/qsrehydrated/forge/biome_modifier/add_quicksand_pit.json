@@ -1,6 +1,11 @@
 {
   "type": "forge:add_features",
-  "biomes": "#qsrehydrated:has_quicksand_pit",
+  "biomes": [
+    "minecraft:desert",
+    "minecraft:badlands",
+    "minecraft:eroded_badlands",
+    "minecraft:wooded_badlands"
+  ],
   "features": "qsrehydrated:quicksand_pit",
   "step": "surface_structures"
 }

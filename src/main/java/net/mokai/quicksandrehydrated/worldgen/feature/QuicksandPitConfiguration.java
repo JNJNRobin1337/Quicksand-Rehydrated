@@ -26,8 +26,13 @@ public class QuicksandPitConfiguration implements FeatureConfiguration {
     public static final float DEFAULT_IRREGULARITY = 0.5f;
     public static final boolean DEFAULT_HAS_BORDER = true;
     public static final Block DEFAULT_BORDER_BLOCK = null; // null means use the same block as the pit
+    public static final int DEFAULT_MIN_HEIGHT = 62; // Default minimum height (sea level)
+    public static final int DEFAULT_MAX_HEIGHT = 320; // Default maximum height
     public static final List<Block> DEFAULT_REPLACEABLE_BLOCKS = Arrays.asList(
-            Blocks.SAND, Blocks.SANDSTONE
+            Blocks.SAND, Blocks.SANDSTONE, Blocks.RED_SAND, Blocks.RED_SANDSTONE, 
+            Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.ROOTED_DIRT, Blocks.GRASS_BLOCK,
+            Blocks.TERRACOTTA, Blocks.WHITE_TERRACOTTA, Blocks.ORANGE_TERRACOTTA, 
+            Blocks.YELLOW_TERRACOTTA, Blocks.BROWN_TERRACOTTA, Blocks.RED_TERRACOTTA
     );
 
     // Codec for serialization/deserialization
@@ -50,7 +55,11 @@ public class QuicksandPitConfiguration implements FeatureConfiguration {
                     // Block to use for the border (defaults to same as pit if not specified)
                     BuiltInRegistries.BLOCK.byNameCodec().optionalFieldOf("border_block").forGetter(config -> config.borderBlock != null ? java.util.Optional.of(config.borderBlock) : java.util.Optional.empty()),
                     // List of blocks that can be replaced by quicksand
-                    BuiltInRegistries.BLOCK.byNameCodec().listOf().optionalFieldOf("replaceable_blocks").forGetter(config -> java.util.Optional.of(config.replaceableBlocks))
+                    BuiltInRegistries.BLOCK.byNameCodec().listOf().optionalFieldOf("replaceable_blocks").forGetter(config -> java.util.Optional.of(config.replaceableBlocks)),
+                    // Minimum height for generation
+                    Codec.INT.fieldOf("min_height").orElse(DEFAULT_MIN_HEIGHT).forGetter(config -> config.minHeight),
+                    // Maximum height for generation
+                    Codec.INT.fieldOf("max_height").orElse(DEFAULT_MAX_HEIGHT).forGetter(config -> config.maxHeight)
             ).apply(instance, QuicksandPitConfiguration::new));
 
     public final Block block;
@@ -62,10 +71,12 @@ public class QuicksandPitConfiguration implements FeatureConfiguration {
     public final boolean hasBorder;
     public final Block borderBlock;
     public final List<Block> replaceableBlocks;
+    public final int minHeight;
+    public final int maxHeight;
 
     public QuicksandPitConfiguration(Block block, int minRadius, int maxRadius, int minDepth, int maxDepth, 
                                     float irregularity, boolean hasBorder, java.util.Optional<Block> borderBlock,
-                                    java.util.Optional<List<Block>> replaceableBlocks) {
+                                    java.util.Optional<List<Block>> replaceableBlocks, int minHeight, int maxHeight) {
         this.block = block;
         this.minRadius = minRadius;
         this.maxRadius = maxRadius;
@@ -75,5 +86,7 @@ public class QuicksandPitConfiguration implements FeatureConfiguration {
         this.hasBorder = hasBorder;
         this.borderBlock = borderBlock.orElse(null);
         this.replaceableBlocks = replaceableBlocks.orElse(DEFAULT_REPLACEABLE_BLOCKS);
+        this.minHeight = minHeight;
+        this.maxHeight = maxHeight;
     }
 }

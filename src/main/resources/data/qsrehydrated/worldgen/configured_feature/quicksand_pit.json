@@ -12,6 +12,8 @@
     "replaceable_blocks": [
       "minecraft:sand",
       "minecraft:sandstone"
-    ]
+    ],
+    "min_height": 62,
+    "max_height": 320
   }
 }

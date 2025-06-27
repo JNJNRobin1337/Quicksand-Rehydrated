@@ -19,20 +19,33 @@ import net.mokai.quicksandrehydrated.registry.ModPlacedFeatures;
 public class ModBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_QUICKSAND_PIT = registerKey("add_quicksand_pit");
     
-    // Tag for desert biomes
+    // Tag per i biomi desertici
     public static final TagKey<Biome> DESERT_BIOMES = TagKey.create(
             Registries.BIOME, new ResourceLocation("minecraft", "is_desert"));
+            
+    // Tag per tutti i biomi dell'overworld
+    public static final TagKey<Biome> OVERWORLD_BIOMES = TagKey.create(
+            Registries.BIOME, new ResourceLocation("minecraft", "is_overworld"));
 
     public static void bootstrap(BootstapContext<BiomeModifier> context) {
         var placedFeatures = context.lookup(Registries.PLACED_FEATURE);
         var biomes = context.lookup(Registries.BIOME);
 
-        // Add quicksand pits to desert biomes
-        context.register(ADD_QUICKSAND_PIT, new ForgeBiomeModifiers.AddFeaturesBiomeModifier(
-                biomes.getOrThrow(DESERT_BIOMES),
-                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.QUICKSAND_PIT_PLACED_KEY)),
-                GenerationStep.Decoration.TOP_LAYER_MODIFICATION
-        ));
+        // Aggiungiamo le pozze di sabbie mobili a tutti i biomi dell'overworld per i test
+        // Questo aumenterà drasticamente la possibilità di trovare le pozze di sabbie mobili
+        try {
+            context.register(ADD_QUICKSAND_PIT, new ForgeBiomeModifiers.AddFeaturesBiomeModifier(
+                    biomes.getOrThrow(OVERWORLD_BIOMES), // Usiamo tutti i biomi dell'overworld per i test
+                    HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.QUICKSAND_PIT_PLACED_KEY)),
+                    GenerationStep.Decoration.TOP_LAYER_MODIFICATION
+            ));
+            
+            System.out.println("[ModBiomeModifiers] Registrato modificatore di biomi per le pozze di sabbie mobili");
+            System.out.println("[ModBiomeModifiers] Feature key: " + ModPlacedFeatures.QUICKSAND_PIT_PLACED_KEY);
+        } catch (Exception e) {
+            System.err.println("[ModBiomeModifiers] ERRORE durante la registrazione del modificatore di biomi: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private static ResourceKey<BiomeModifier> registerKey(String name) {

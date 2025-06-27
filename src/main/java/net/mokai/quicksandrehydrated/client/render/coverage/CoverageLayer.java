@@ -100,10 +100,10 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
                 continue;
             }
 
-            // Modifichiamo leggermente il calcolo per assicurarci che il primo pixel sia coperto
-            // Usiamo un piccolo offset per assicurarci che il coverage copra completamente i piedi
-            double bot = 1.0 - (entry.end/32.0) - 0.001;
-            double top = 1.0 - (entry.begin/32.0) + 0.001;
+            // Calcoliamo i limiti del coverage in modo più preciso per allinearlo con la superficie del blocco
+            // Rimuoviamo gli offset che causavano problemi con il buoyancy
+            double bot = 1.0 - (entry.end/32.0); // Rimosso offset negativo
+            double top = 1.0 - (entry.begin/32.0); // Rimosso offset positivo
 
             // Get the texture for this coverage
             TextureAtlasSprite colorTex;
@@ -120,12 +120,16 @@ public class CoverageLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
                     float A = alphaValues[i][k];
                     
                     // If the alpha of this pixel is within the bounds, use the pixel from the coverage texture
-                    // Modifichiamo la condizione per assicurarci che i pixel ai bordi siano inclusi
-                    if (A <= top && A >= bot) {
+                    // Modifichiamo la condizione per un calcolo più preciso del coverage
+                    // Utilizziamo una tolleranza minima per evitare problemi di precisione dei float
+                    if (A <= top + 0.0001f && A >= bot - 0.0001f) {
                         int color_rgba = colorTex.getPixelRGBA(0, i, k);
                         
+                        // Otteniamo l'opacità originale
+                        int alpha = FastColor.ARGB32.alpha(color_rgba);
+                        
                         // Only set the pixel if it has some opacity
-                        if (FastColor.ARGB32.alpha(color_rgba) > 0) {
+                        if (alpha > 0) {
                             img.setPixelRGBA(i, k, color_rgba);
                         }
                     }
