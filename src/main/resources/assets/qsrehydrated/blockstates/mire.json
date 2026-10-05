@@ -1,0 +1,21 @@
+{
+"variants": {
+"": [
+{
+"model": "qsrehydrated:block/mire"
+},
+{
+"model": "qsrehydrated:block/mire",
+"y": 90
+},
+{
+"model": "qsrehydrated:block/mire",
+"y": 180
+},
+{
+"model": "qsrehydrated:block/mire",
+"y": 270
+}
+]
+}
+}
