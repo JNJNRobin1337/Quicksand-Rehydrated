@@ -205,6 +205,7 @@ public class QuicksandRegistry {
     public static final RegistryObject<Block> TIDAL_MUD = registerBlock("tidal_mud", () -> new QuicksandBase( muddyBlockBehavior.sound(SoundType.MUD), tidalMudBehaviour));
 
     public static final RegistryObject<Block> MIRE = registerBlock("mire", () -> new DeepMudBlock( muddyBlockBehavior.sound(SoundType.MUD), MudBehavior, 1.0d));
+    public static final RegistryObject<Block> MARSH = registerBlock("marsh", () -> new DeepMudBlock( muddyBlockBehavior.sound(SoundType.MUD), MudBehavior, 1.0d));
 
     public static final RegistryObject<Block> SOFT_QUICKSAND = registerBlock("soft_quicksand", () -> new FlowingQuicksandBase(baseFlowingBlockBehavior, new QuicksandBehavior()
             .setBuoyancyPoint(BodyDepthThreshold.ABDOMEN.depth) // Buoyancy value for the knees (derived from SHOULDERS)
@@ -244,6 +245,7 @@ public class QuicksandRegistry {
         addItem(BOTTOMLESS_MUD);
         addItem(TIDAL_MUD);
         addItem(MIRE);
+        addItem(MARSH);
 
         addItem(WHITE_QUICKRUG);
         addItem(ORANGE_QUICKRUG);
