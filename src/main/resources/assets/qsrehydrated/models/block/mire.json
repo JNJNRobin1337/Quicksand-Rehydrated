@@ -3,7 +3,7 @@
 	"textures": {
 		"1": "qsrehydrated:block/miretop",
 		"2": "qsrehydrated:block/mireside",
-		"particle": "qsrehydrated:block/mossy_peat_bod_top_2"
+		"particle": "qsrehydrated:block/mossy_peat_bog_top_2"
 	},
 	"elements": [
 		{
