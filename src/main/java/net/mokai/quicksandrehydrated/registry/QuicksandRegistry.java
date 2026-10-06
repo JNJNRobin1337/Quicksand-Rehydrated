@@ -68,12 +68,12 @@ public class QuicksandRegistry {
             .setVertSpeed(0.4)
             .setWalkSpeed(new DepthCurve(new double[]{0.9, 0.55, 0.15, 0.1, 0.0}))
             .setSinkSpeed(0)
-            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Valore di buoyancy per le ginocchia
+            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Buoyancy value for the knees
             .setCoverageTexture("mud_coverage")
             .setResurfingForce(0.025); // Moderate resurfing force for mud
 
 
-    // Not that deep, not designed to get stuck stuck in but shoud be a slog to walk through
+    // Not that deep, not designed to get stuck in but shoud be a slog to walk through
     static QuicksandBehavior tidalMudBehaviour = new QuicksandBehavior()
         .setVertSpeed(0.3)
         .setWalkSpeed(new ArrayList<>(List.of(
@@ -115,7 +115,7 @@ public class QuicksandRegistry {
             .setWobbleApply(-0.5d/20.0d)
 
             .setStepOutHeight(BodyDepthThreshold.FEET.depth)
-            .setBuoyancyPoint(BodyDepthThreshold.FEET.depth) // Valore di buoyancy per le caviglie
+            .setBuoyancyPoint(BodyDepthThreshold.FEET.depth) // Buoyancy value for the ankles
             .setResurfingForce(0.06) // High resurfing force for quickrug
 
             .addQuicksandEffect(QuicksandWobbleMEffect.class);
@@ -136,7 +136,7 @@ public class QuicksandRegistry {
             .setSinkSpeed(.0005d)
             .setVertSpeed(.1d)
             .setWalkSpeed(new DepthCurve(0.9, 0.1))
-            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Valore di buoyancy per le ginocchia (ridotto da CHEST)
+            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Buoyancy value for the knees (derived from CHEST)
             .setResurfingForce(0.03) // Default resurfing force
     ));
 
@@ -147,7 +147,7 @@ public class QuicksandRegistry {
             .setWobbleMove(new DepthCurve(new double[]{0.01d, 0.001d}))
             .setWobbleTugHorizontal(0.1)
             .setWobbleTugVertical(0.1)
-            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Valore di buoyancy per le ginocchia (ridotto da WAIST)
+            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Buoyancy value for the knees (calculated from WAIST)
             .setResurfingForce(0.05) // Higher resurfing force for slime
 
             .addQuicksandEffect(QuicksandWobblePEffect.class)
@@ -170,7 +170,7 @@ public class QuicksandRegistry {
             .setCoverageTexture("peat_bog_coverage")
             .setResurfingForce(0.02) // Lower resurfing force for bog
 
-            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Valore di buoyancy per le ginocchia
+            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Buoyancy value for the knees
     ));
 
     public static final RegistryObject<Block> PEAT_BOG = registerBlock("peat_bog", () -> new MossyPeatBog(muddyBlockBehavior, new QuicksandBehavior()
@@ -180,7 +180,7 @@ public class QuicksandRegistry {
 
             .setWobbleMove(.6)
             .setWobbleTugHorizontal(.4)
-            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Valore di buoyancy per le ginocchia (ridotto da coscia alta)
+            .setBuoyancyPoint(BodyDepthThreshold.KNEE.depth) // Buoyancy value for the knees (reduced from the upper thigh)
             .setResurfingForce(0.02) // Lower resurfing force for bog
 
             .setBubbleChance(.9)
@@ -191,7 +191,7 @@ public class QuicksandRegistry {
 
 
     public static final RegistryObject<Block> BOG = registerBlock("bog", () -> new QuicksandBase(muddyBlockBehavior, new QuicksandBehavior()
-            .setBuoyancyPoint(BodyDepthThreshold.ABDOMEN.depth) // Valore di buoyancy per le ginocchia (ridotto da WAIST)
+            .setBuoyancyPoint(BodyDepthThreshold.ABDOMEN.depth) // Buoyancy value for the knees (calculated from WAIST)
             .setResurfingForce(0.005) // Lower resurfing force for bog
             .setCoverageTexture("bog_coverage")
     ));
@@ -204,8 +204,10 @@ public class QuicksandRegistry {
 
     public static final RegistryObject<Block> TIDAL_MUD = registerBlock("tidal_mud", () -> new QuicksandBase( muddyBlockBehavior.sound(SoundType.MUD), tidalMudBehaviour));
 
+    public static final RegistryObject<Block> MIRE = registerBlock("mire", () -> new DeepMudBlock( muddyBlockBehavior.sound(SoundType.MUD), MudBehavior, 1.0d));
+
     public static final RegistryObject<Block> SOFT_QUICKSAND = registerBlock("soft_quicksand", () -> new FlowingQuicksandBase(baseFlowingBlockBehavior, new QuicksandBehavior()
-            .setBuoyancyPoint(BodyDepthThreshold.ABDOMEN.depth) // Valore di buoyancy per le ginocchia (ridotto da SHOULDERS)
+            .setBuoyancyPoint(BodyDepthThreshold.ABDOMEN.depth) // Buoyancy value for the knees (derived from SHOULDERS)
             .setResurfingForce(0.04) // Higher resurfing force for soft quicksand
     ));
 
@@ -241,6 +243,7 @@ public class QuicksandRegistry {
         addItem(DEEP_MUD);
         addItem(BOTTOMLESS_MUD);
         addItem(TIDAL_MUD);
+        addItem(MIRE);
 
         addItem(WHITE_QUICKRUG);
         addItem(ORANGE_QUICKRUG);
